@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="episode"
+            type="de.rkirchner.podzeit.ui.playlist.EpisodePlaylistEntryJoin" />
+
+        <variable
+            name="formatter"
+            type="de.rkirchner.podzeit.ui.common.FormatterUtil" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginBottom="1dp"
+        android:background="#f2f2f2"
+        android:foreground="?selectableItemBackground">
+
+        <android.support.constraint.Guideline
+            android:id="@+id/playlist_item_left_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.03" />
+
+        <TextView
+            android:id="@+id/playlist_item_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="@{episode.title}"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/playlist_item_swap_icon"
+            app:layout_constraintStart_toStartOf="@id/playlist_item_left_guideline"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Title" />
+
+        <TextView
+            android:id="@+id/playlist_item_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@{formatter.formatDuration(episode.duration)}"
+            android:textSize="14sp"
+            app:layout_constraintStart_toEndOf="@id/playlist_item_left_guideline"
+            app:layout_constraintTop_toBottomOf="@id/playlist_item_title"
+            tools:text="01:04:06" />
+
+        <ImageButton
+            android:id="@+id/playlist_item_swap_icon"
+            android:layout_width="?listPreferredItemHeight"
+            android:layout_height="0dp"
+            android:background="?selectableItemBackground"
+            android:src="@drawable/ic_swap_vert"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

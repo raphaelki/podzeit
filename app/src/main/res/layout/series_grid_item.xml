@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <variable
+            name="series"
+            type="de.rkirchner.podzeit.data.models.Series" />
+
+        <variable
+            name="callback"
+            type="de.rkirchner.podzeit.ui.seriesgrid.SeriesGridClickCallback" />
+    </data>
+
+    <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        imageUrl="@{series.thumbnailUrl}"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:onClick="@{()-> callback.onSeriesSelected(series.rssUrl)}"
+        tools:src="@drawable/wasjetz" />
+</layout>

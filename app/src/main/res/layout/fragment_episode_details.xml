@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="episode"
+            type="de.rkirchner.podzeit.data.models.Episode" />
+
+        <variable
+            name="formatter"
+            type="de.rkirchner.podzeit.ui.common.FormatterUtil" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#f2f2f2">
+
+        <android.support.constraint.Guideline
+            android:id="@+id/episode_details_item_left_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.03" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/episode_details_item_right_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.97" />
+
+        <TextView
+            android:id="@+id/episode_details_item_pub_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_horizontal"
+            android:singleLine="true"
+            android:text="@{formatter.formatPubDate(episode.pubDate)}"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@id/episode_details_item_duration"
+            app:layout_constraintStart_toStartOf="@id/episode_details_item_left_guideline"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="10.10.2018" />
+
+        <TextView
+            android:id="@+id/episode_details_item_duration"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@{formatter.formatDuration(episode.duration)}"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@id/episode_details_item_size"
+            app:layout_constraintStart_toEndOf="@id/episode_details_item_pub_date"
+            app:layout_constraintTop_toTopOf="@id/episode_details_item_pub_date"
+            tools:text="01:04:06" />
+
+        <TextView
+            android:id="@+id/episode_details_item_size"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@{formatter.formatFileSizeToMb(episode.size)}"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@id/episode_details_item_headphone_icon"
+            app:layout_constraintStart_toEndOf="@id/episode_details_item_duration"
+            app:layout_constraintTop_toTopOf="@id/episode_details_item_pub_date"
+            tools:text="198 MB" />
+
+        <TextView
+            android:id="@+id/episode_details_item_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{episode.title}"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/episode_details_item_playlist_add_icon"
+            app:layout_constraintStart_toStartOf="@id/episode_details_item_left_guideline"
+            app:layout_constraintTop_toBottomOf="@id/episode_details_item_pub_date"
+            tools:text="Long long long long long long long long Title" />
+
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/episode_details_item_summary"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/episode_details_item_playlist_add_icon"
+            app:layout_constraintStart_toStartOf="@id/episode_details_item_left_guideline"
+            app:layout_constraintTop_toBottomOf="@id/episode_details_item_title">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="8dp"
+                android:text="@{episode.summary}"
+                android:textSize="12sp"
+                tools:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet." />
+
+        </android.support.v4.widget.NestedScrollView>
+
+        <ImageButton
+            android:id="@+id/episode_details_item_playlist_add_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:background="@null"
+            android:src="@drawable/ic_playlist_add"
+            app:layout_constraintEnd_toEndOf="@id/episode_details_item_right_guideline"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/episode_details_item_play_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="8dp"
+            android:background="@null"
+            android:src="@drawable/ic_play_arrow"
+            app:layout_constraintEnd_toEndOf="@id/episode_details_item_right_guideline"
+            app:layout_constraintTop_toBottomOf="@id/episode_details_item_playlist_add_icon" />
+
+        <ImageView
+            android:id="@+id/episode_details_item_headphone_icon"
+            dontRemoveFromLayout="true"
+            visible="@{episode.wasPlayed}"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:background="@null"
+            android:src="@drawable/ic_headset"
+            android:tint="#1e9100"
+            app:layout_constraintBottom_toBottomOf="@id/episode_details_item_pub_date"
+            app:layout_constraintEnd_toStartOf="@id/episode_details_item_playlist_add_icon"
+            app:layout_constraintStart_toEndOf="@id/episode_details_item_size"
+            app:layout_constraintTop_toTopOf="@id/episode_details_item_pub_date" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

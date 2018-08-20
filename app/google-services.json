@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "753278054814",
+    "firebase_url": "https://podzeit.firebaseio.com",
+    "project_id": "podzeit",
+    "storage_bucket": "podzeit.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753278054814:android:4231f3b910289a9c",
+        "android_client_info": {
+          "package_name": "de.rkirchner.podzeit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "753278054814-ifa76k89rg917v77v2k55ju10s8d9nfk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "de.rkirchner.podzeit",
+            "certificate_hash": "ecc127160a75161fe2f94e76ce0d45e2fe3a9a4d"
+          }
+        },
+        {
+          "client_id": "753278054814-f3t8t2ogu93qovtmtm66ihq17uvg21ci.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3487n187tpCJ9XTjAL6NIyHIEfUl6Lsg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "753278054814-f3t8t2ogu93qovtmtm66ihq17uvg21ci.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

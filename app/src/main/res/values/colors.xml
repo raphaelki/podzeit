@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#fefffb</color>
+    <color name="colorPrimaryDark">#c9ccbc</color>
+    <color name="colorAccent">#ff6e40</color>
+    <color name="player_control_tint">#000000</color>
+    <color name="playlist_add_tint">#25ab00</color>
+</resources>
