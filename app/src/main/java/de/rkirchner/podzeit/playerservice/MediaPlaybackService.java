@@ -1,5 +1,7 @@
-package de.rkirchner.podzeit.player;
+package de.rkirchner.podzeit.playerservice;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +14,7 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -45,6 +48,8 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     private MediaControllerCompat controller;
     private NotificationManagerCompat notificationManager;
     private NotificationBuilder notificationBuilder;
+
+    private boolean isForeground = false;
 
     @Nullable
     @Override
@@ -95,29 +100,17 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         super.onCreate();
         obtainPlayerInstance();
 
+        Intent sessionIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+        PendingIntent sessionActivityPendingIntent = PendingIntent.getActivity(this, 0, sessionIntent, 0);
         mediaSession = new MediaSessionCompat(this, LOG_TAG);
+        mediaSession.setSessionActivity(sessionActivityPendingIntent);
+        mediaSession.setActive(true);
 
-        // Enable callbacks from MediaButtons and TransportControls
-        mediaSession.setFlags(
-                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
-//        // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player
-//        stateBuilder = new PlaybackStateCompat.Builder()
-//                .setActions(
-//                        PlaybackStateCompat.ACTION_PLAY |
-//                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
-//        mediaSession.setPlaybackState(stateBuilder.build());
-//
-//        // MySessionCallback() has methods that handle callbacks from a media controller
         notificationBuilder = new NotificationBuilder(this, mediaSession);
         notificationManager = NotificationManagerCompat.from(this);
-//        MediaSessionCallbacks mediaSessionCallbacks = new MediaSessionCallbacks(this, notificationBuilder, mediaSession, player);
-//        mediaSession.setCallback(mediaSessionCallbacks);
         controller = new MediaControllerCompat(this, mediaSession);
         controller.registerCallback(new MediaControllerCallback());
 
-        //
         mediaSessionConnector = new MediaSessionConnector(mediaSession);
         mediaSessionConnector.setPlayer(player, new PlaybackPreparerImpl());
 
@@ -147,19 +140,34 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         MediaSource mediaSource = new ExtractorMediaSource.Factory(
                 defaultHttpDataSourceFactory)
                 .createMediaSource(uri);
-        player.prepare(mediaSource, true, false);
+        player.prepare(mediaSource);
+    }
+
+    @Override
+    public void onDestroy() {
+        mediaSession.setActive(false);
+        mediaSession.release();
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Log.d(LOG_TAG, "onTaskRemoved");
+        super.onTaskRemoved(rootIntent);
+        stopSelf();
     }
 
     private class MediaControllerCallback extends MediaControllerCompat.Callback {
 
         @Override
         public void onPlaybackStateChanged(PlaybackStateCompat state) {
-            super.onPlaybackStateChanged(state);
 
+            Log.d(LOG_TAG, "Playback state changed: " + state.getState());
             if (state.getState() == PlaybackStateCompat.STATE_PLAYING) {
                 startForeground(NOW_PLAYING_NOTIFICATION_ID, notificationBuilder.build());
-            } else {
+                isForeground = true;
+            } else if (state.getState() == PlaybackStateCompat.STATE_PAUSED) {
                 stopForeground(false);
+                notificationManager.notify(NOW_PLAYING_NOTIFICATION_ID, notificationBuilder.build());
             }
 
         }

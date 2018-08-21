@@ -1,4 +1,4 @@
-package de.rkirchner.podzeit.player;
+package de.rkirchner.podzeit.playerservice;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -77,7 +77,7 @@ public class NotificationBuilder {
                 .setSubText(description.getDescription())
                 .setLargeIcon(description.getIconBitmap())
                 .setContentIntent(mediaController.getSessionActivity())
-                .setSmallIcon(R.drawable.ic_autorenew)
+                .setSmallIcon(R.drawable.ic_play_circle_outline)
                 .setDeleteIntent(stopIntent)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setStyle(mediaStyle);

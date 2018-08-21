@@ -10,18 +10,6 @@
         android:paddingBottom="16dp"
         tools:context=".ui.player.PlayerFragment">
 
-        <!--<com.google.android.exoplayer2.ui.PlayerView-->
-        <!--android:id="@+id/player_view"-->
-        <!--app:use_artwork="false"-->
-        <!--app:hide_on_touch="false"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="#fff"-->
-        <!--app:layout_constraintLeft_toLeftOf="parent"-->
-        <!--app:layout_constraintRight_toRightOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent"-->
-        <!--app:show_timeout="0"/>-->
-
         <TextView
             android:id="@+id/player_title"
             android:layout_width="wrap_content"
@@ -42,44 +30,44 @@
             app:unplayed_color="#bcbcbc" />
 
         <ImageButton
-            android:id="@id/exo_prev"
+            android:id="@+id/player_prev"
             style="@style/ExoMediaButton.Previous"
             android:tint="@color/player_control_tint"
-            app:layout_constraintEnd_toStartOf="@+id/exo_rew"
+            app:layout_constraintEnd_toStartOf="@+id/player_rew"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/player_time_bar" />
+            app:layout_constraintTop_toBottomOf="@+id/player_time_bar" />
 
         <ImageButton
-            android:id="@id/exo_rew"
+            android:id="@+id/player_rew"
             style="@style/ExoMediaButton.Rewind"
             android:tint="@color/player_control_tint"
-            app:layout_constraintEnd_toStartOf="@+id/exo_play"
-            app:layout_constraintStart_toEndOf="@+id/exo_prev"
-            app:layout_constraintTop_toTopOf="@id/exo_prev" />
+            app:layout_constraintEnd_toStartOf="@+id/player_play"
+            app:layout_constraintStart_toEndOf="@+id/player_prev"
+            app:layout_constraintTop_toTopOf="@+id/player_prev" />
 
         <ImageButton
-            android:id="@id/exo_play"
+            android:id="@+id/player_play"
             style="@style/ExoMediaButton.Play"
             android:tint="@color/player_control_tint"
-            app:layout_constraintEnd_toStartOf="@+id/exo_ffwd"
-            app:layout_constraintStart_toEndOf="@+id/exo_rew"
-            app:layout_constraintTop_toTopOf="@id/exo_prev" />
+            app:layout_constraintEnd_toStartOf="@+id/player_ffwd"
+            app:layout_constraintStart_toEndOf="@+id/player_rew"
+            app:layout_constraintTop_toTopOf="@+id/player_prev" />
 
         <ImageButton
-            android:id="@id/exo_ffwd"
+            android:id="@+id/player_ffwd"
             style="@style/ExoMediaButton.FastForward"
             android:tint="@color/player_control_tint"
-            app:layout_constraintEnd_toStartOf="@+id/exo_next"
-            app:layout_constraintStart_toEndOf="@+id/exo_play"
-            app:layout_constraintTop_toTopOf="@id/exo_prev" />
+            app:layout_constraintEnd_toStartOf="@+id/player_next"
+            app:layout_constraintStart_toEndOf="@+id/player_play"
+            app:layout_constraintTop_toTopOf="@id/player_prev" />
 
         <ImageButton
-            android:id="@id/exo_next"
+            android:id="@+id/player_next"
             style="@style/ExoMediaButton.Next"
             android:tint="@color/player_control_tint"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/exo_ffwd"
-            app:layout_constraintTop_toTopOf="@id/exo_prev" />
+            app:layout_constraintStart_toEndOf="@+id/player_ffwd"
+            app:layout_constraintTop_toTopOf="@id/player_prev" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

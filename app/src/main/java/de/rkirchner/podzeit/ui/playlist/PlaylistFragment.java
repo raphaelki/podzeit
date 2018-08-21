@@ -7,7 +7,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -33,6 +32,7 @@ public class PlaylistFragment extends DaggerFragment {
     @Inject
     PlaylistAdapter adapter;
     private FragmentPlaylistBinding binding;
+    private PlaylistViewModel viewModel;
     private ItemTouchHelper itemTouchHelper;
     private OnStartDragListener onStartDragListener = new OnStartDragListener() {
         @Override
@@ -54,7 +54,7 @@ public class PlaylistFragment extends DaggerFragment {
         itemTouchHelper.attachToRecyclerView(binding.playlistRv);
         adapter.registerOnStartDragListener(onStartDragListener);
         adapter.registerPlaybackCallback(() -> {
-            MediaControllerCompat.getMediaController(getActivity()).getTransportControls().play();
+            viewModel.startPlayback();
         });
         binding.playlistRv.setAdapter(adapter);
         binding.fab.setOnClickListener(view -> navigationController.navigateToSeriesGrid());
@@ -64,7 +64,7 @@ public class PlaylistFragment extends DaggerFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        PlaylistViewModel viewModel = ViewModelProviders.of(this, viewModelFactory).get(PlaylistViewModel.class);
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(PlaylistViewModel.class);
         viewModel.getPlaylistEpisodes().observe(this, episodes -> {
             adapter.swapList(episodes);
         });

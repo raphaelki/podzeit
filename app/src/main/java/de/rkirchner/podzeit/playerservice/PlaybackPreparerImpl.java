@@ -1,8 +1,9 @@
-package de.rkirchner.podzeit.player;
+package de.rkirchner.podzeit.playerservice;
 
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
@@ -11,7 +12,8 @@ public class PlaybackPreparerImpl implements MediaSessionConnector.PlaybackPrepa
 
     @Override
     public long getSupportedPrepareActions() {
-        return 0;
+        return PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID |
+                PlaybackStateCompat.ACTION_PREPARE_FROM_MEDIA_ID;
     }
 
     @Override

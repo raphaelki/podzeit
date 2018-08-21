@@ -1,7 +1,9 @@
 package de.rkirchner.podzeit.ui.common;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 
 import javax.inject.Inject;
 
@@ -11,14 +13,16 @@ import de.rkirchner.podzeit.ui.episodedetails.EpisodeDetailsFragment;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListClickCallback;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListFragment;
 import de.rkirchner.podzeit.ui.player.PlayerFragment;
+import de.rkirchner.podzeit.ui.player.PlayerVisibilityListener;
 import de.rkirchner.podzeit.ui.playlist.PlaylistFragment;
 import de.rkirchner.podzeit.ui.seriesgrid.SeriesGridClickCallback;
 import de.rkirchner.podzeit.ui.seriesgrid.SeriesGridFragment;
 
-public class NavigationController implements SeriesGridClickCallback, EpisodeListClickCallback {
+public class NavigationController implements SeriesGridClickCallback, EpisodeListClickCallback, PlayerVisibilityListener {
 
     private final int PLAYER_FRAGMENT_FRAME_ID = R.id.player_fragment_frame;
     private final int UPPER_FRAGMENT_FRAME_ID = R.id.upper_fragment_frame;
+    private final String PLAYER_FRAGMENT_TAG = "player_fragment";
     private Context context;
     private FragmentManager fragmentManager;
 
@@ -28,10 +32,24 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
         this.context = context;
     }
 
-    public void bindPlayer() {
-        fragmentManager.beginTransaction()
-                .add(PLAYER_FRAGMENT_FRAME_ID, new PlayerFragment())
-                .commit();
+    private void showPlayer() {
+        Fragment playerFragment = fragmentManager.findFragmentByTag(PLAYER_FRAGMENT_TAG);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        if (playerFragment == null) {
+            fragmentTransaction.add(PLAYER_FRAGMENT_FRAME_ID, new PlayerFragment(), PLAYER_FRAGMENT_TAG);
+        } else {
+            fragmentTransaction.show(playerFragment);
+        }
+        fragmentTransaction.commit();
+    }
+
+    private void hidePlayer() {
+        Fragment playerFragment = fragmentManager.findFragmentByTag(PLAYER_FRAGMENT_TAG);
+        if (playerFragment != null) {
+            fragmentManager.beginTransaction()
+                    .hide(playerFragment)
+                    .commit();
+        }
     }
 
     public void navigateToPlaylist() {
@@ -69,5 +87,11 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
     @Override
     public void onEpisodeSelected(int episodeId) {
         navigateToEpisodeDetails(episodeId);
+    }
+
+    @Override
+    public void onToggleVisibility(boolean showPlayer) {
+        if (showPlayer) showPlayer();
+        else hidePlayer();
     }
 }

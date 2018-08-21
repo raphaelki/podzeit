@@ -8,6 +8,7 @@ import de.rkirchner.podzeit.ui.episodedetails.EpisodeDetailsFragment;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListClickCallback;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListFragment;
 import de.rkirchner.podzeit.ui.player.PlayerFragment;
+import de.rkirchner.podzeit.ui.player.PlayerVisibilityListener;
 import de.rkirchner.podzeit.ui.playlist.PlaylistFragment;
 import de.rkirchner.podzeit.ui.seriesgrid.SeriesGridClickCallback;
 import de.rkirchner.podzeit.ui.seriesgrid.SeriesGridFragment;
@@ -35,4 +36,7 @@ public abstract class FragmentBindingModule {
 
     @Binds
     abstract EpisodeListClickCallback bindEpisodeListClickCallback(NavigationController navigationController);
+
+    @Binds
+    abstract PlayerVisibilityListener bindPlayerVisibilityListener(NavigationController navigationController);
 }

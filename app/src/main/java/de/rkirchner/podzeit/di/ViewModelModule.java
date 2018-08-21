@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap;
 import de.rkirchner.podzeit.ui.common.ViewModelFactory;
 import de.rkirchner.podzeit.ui.episodedetails.EpisodeDetailsViewModel;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListViewModel;
+import de.rkirchner.podzeit.ui.player.PlayerViewModel;
 import de.rkirchner.podzeit.ui.playlist.PlaylistViewModel;
 import de.rkirchner.podzeit.ui.seriesgrid.SeriesGridViewModel;
 
@@ -37,4 +38,9 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(PlaylistViewModel.class)
     abstract ViewModel bindPlaylistViewModel(PlaylistViewModel playlistViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(PlayerViewModel.class)
+    abstract ViewModel bindPlayerViewModel(PlayerViewModel playerViewModel);
 }
