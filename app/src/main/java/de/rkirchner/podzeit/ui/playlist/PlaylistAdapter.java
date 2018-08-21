@@ -42,7 +42,7 @@ public class PlaylistAdapter extends RecyclerViewListAdapter<PlaylistItemBinding
             @Override
             public void onClick(View v) {
                 Timber.d("Playlist item selected");
-                playbackCallback.onStartPlayback();
+                playbackCallback.onStartPlayback(getList().get(position));
             }
         });
         if (onStartDragListener != null) {

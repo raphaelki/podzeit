@@ -2,7 +2,6 @@ package de.rkirchner.podzeit.playerservice;
 
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,14 +20,10 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,6 +108,8 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
 
         mediaSessionConnector = new MediaSessionConnector(mediaSession);
         mediaSessionConnector.setPlayer(player, new PlaybackPreparerImpl());
+        mediaSessionConnector.setQueueNavigator(new QueueNavigatorImpl(controller, this, player));
+        mediaSessionConnector.setQueueEditor(new QueueEditorImpl(mediaSession));
 
         audioAttributes = new AudioAttributesCompat.Builder()
                 .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
@@ -133,14 +130,14 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
                 new DefaultTrackSelector(adaptiveTrackSelectionFactory),
                 new DefaultLoadControl());
 
-        String userAgent = Util.getUserAgent(this, "zeit");
-        DefaultHttpDataSourceFactory defaultHttpDataSourceFactory =
-                new DefaultHttpDataSourceFactory(userAgent);
-        Uri uri = Uri.parse("https://cdn.podigee.com/media/podcast_1652_was_jetzt_episode_236_einwanderung_in_spanien_noch_kein_thema.mp3?v=1534734347&source=feed");
-        MediaSource mediaSource = new ExtractorMediaSource.Factory(
-                defaultHttpDataSourceFactory)
-                .createMediaSource(uri);
-        player.prepare(mediaSource);
+//        String userAgent = Util.getUserAgent(this, "zeit");
+//        DefaultHttpDataSourceFactory defaultHttpDataSourceFactory =
+//                new DefaultHttpDataSourceFactory(userAgent);
+//        Uri uri = Uri.parse("https://cdn.podigee.com/media/podcast_1652_was_jetzt_episode_236_einwanderung_in_spanien_noch_kein_thema.mp3?v=1534734347&source=feed");
+//        MediaSource mediaSource = new ExtractorMediaSource.Factory(
+//                defaultHttpDataSourceFactory)
+//                .createMediaSource(uri);
+//        player.prepare(mediaSource);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package de.rkirchner.podzeit.playerclient;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,7 +8,10 @@ import android.os.RemoteException;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -27,6 +31,7 @@ public class MediaSessionClient {
     private MutableLiveData<PlaybackStateCompat> playbackState = new MutableLiveData<>();
     private PlaybackStateCompat.Builder playbackStateBuilder = new PlaybackStateCompat.Builder();
     private MediaControllerCompat.TransportControls transportControls;
+    private MutableLiveData<List<MediaSessionCompat.QueueItem>> queueItems = new MutableLiveData<>();
 
     @Inject
     public MediaSessionClient(Context context) {
@@ -46,7 +51,6 @@ public class MediaSessionClient {
         mediaControllerCallback = new MediaControllerCallback();
         ComponentName componentName = new ComponentName(context, MediaPlaybackService.class);
         mediaBrowser = new MediaBrowserCompat(context, componentName, connectionCallbacks, null);
-
     }
 
     public MutableLiveData<Boolean> getIsServiceConnected() {
@@ -59,6 +63,14 @@ public class MediaSessionClient {
 
     public MediaControllerCompat.TransportControls getTransportControls() {
         return transportControls;
+    }
+
+    public MediaControllerCompat getMediaController() {
+        return mediaController;
+    }
+
+    public LiveData<List<MediaSessionCompat.QueueItem>> getQueueItems() {
+        return queueItems;
     }
 
     private class MediaBrowserConnectionCallbacks extends MediaBrowserCompat.ConnectionCallback {
@@ -101,6 +113,11 @@ public class MediaSessionClient {
         @Override
         public void onMetadataChanged(MediaMetadataCompat metadata) {
 
+        }
+
+        @Override
+        public void onQueueChanged(List<MediaSessionCompat.QueueItem> queue) {
+            queueItems.postValue(queue);
         }
     }
 }

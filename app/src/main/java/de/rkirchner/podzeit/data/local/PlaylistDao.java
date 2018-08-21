@@ -19,7 +19,7 @@ public interface PlaylistDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     void insertEntry(PlaylistEntry playlistEntry);
 
-    @Query(value = "SELECT id, title, playlistPosition, duration FROM podcast_episodes INNER JOIN playlist ON playlist.episodeId = id ORDER BY playlistPosition ASC")
+    @Query(value = "SELECT id, title, playlistPosition, duration, url FROM podcast_episodes INNER JOIN playlist ON playlist.episodeId = id ORDER BY playlistPosition ASC")
     LiveData<List<EpisodePlaylistEntryJoin>> getEpisodesInPlaylist();
 
     @Query(value = "SELECT * FROM playlist WHERE episodeId = :episodeId")

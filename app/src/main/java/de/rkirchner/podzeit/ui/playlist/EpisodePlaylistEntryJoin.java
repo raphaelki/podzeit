@@ -8,6 +8,15 @@ public class EpisodePlaylistEntryJoin {
     private String title;
     private int playlistPosition;
     private String duration;
+    private String url;
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
     public int getId() {
         return id;

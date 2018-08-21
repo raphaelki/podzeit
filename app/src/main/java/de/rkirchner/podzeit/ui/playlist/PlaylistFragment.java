@@ -53,8 +53,11 @@ public class PlaylistFragment extends DaggerFragment {
         itemTouchHelper = new ItemTouchHelper(itemTouchHelperCallback);
         itemTouchHelper.attachToRecyclerView(binding.playlistRv);
         adapter.registerOnStartDragListener(onStartDragListener);
-        adapter.registerPlaybackCallback(() -> {
-            viewModel.startPlayback();
+        adapter.registerPlaybackCallback(new PlaybackCallback() {
+            @Override
+            public void onStartPlayback(EpisodePlaylistEntryJoin episode) {
+                viewModel.startPlayback(episode);
+            }
         });
         binding.playlistRv.setAdapter(adapter);
         binding.fab.setOnClickListener(view -> navigationController.navigateToSeriesGrid());
