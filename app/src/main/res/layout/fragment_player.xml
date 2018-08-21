@@ -26,7 +26,8 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/player_title"
-            app:played_color="#000"
+            app:buffered_color="#ffd67e"
+            app:played_color="@color/colorAccent"
             app:unplayed_color="#bcbcbc" />
 
         <ImageButton

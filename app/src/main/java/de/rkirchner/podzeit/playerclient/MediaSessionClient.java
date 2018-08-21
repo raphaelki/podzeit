@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -32,6 +33,7 @@ public class MediaSessionClient {
     private PlaybackStateCompat.Builder playbackStateBuilder = new PlaybackStateCompat.Builder();
     private MediaControllerCompat.TransportControls transportControls;
     private MutableLiveData<List<MediaSessionCompat.QueueItem>> queueItems = new MutableLiveData<>();
+    private MutableLiveData<MediaMetadataCompat> mediaMetadata = new MutableLiveData<>();
 
     @Inject
     public MediaSessionClient(Context context) {
@@ -73,6 +75,10 @@ public class MediaSessionClient {
         return queueItems;
     }
 
+    public LiveData<MediaMetadataCompat> getMediaMetadata() {
+        return mediaMetadata;
+    }
+
     private class MediaBrowserConnectionCallbacks extends MediaBrowserCompat.ConnectionCallback {
         @Override
         public void onConnected() {
@@ -101,6 +107,51 @@ public class MediaSessionClient {
     private class MediaControllerCallback extends MediaControllerCompat.Callback {
 
         @Override
+        public void onSessionReady() {
+            super.onSessionReady();
+        }
+
+        @Override
+        public void onSessionEvent(String event, Bundle extras) {
+            super.onSessionEvent(event, extras);
+        }
+
+        @Override
+        public void onQueueTitleChanged(CharSequence title) {
+            super.onQueueTitleChanged(title);
+        }
+
+        @Override
+        public void onExtrasChanged(Bundle extras) {
+            super.onExtrasChanged(extras);
+        }
+
+        @Override
+        public void onAudioInfoChanged(MediaControllerCompat.PlaybackInfo info) {
+            super.onAudioInfoChanged(info);
+        }
+
+        @Override
+        public void onCaptioningEnabledChanged(boolean enabled) {
+            super.onCaptioningEnabledChanged(enabled);
+        }
+
+        @Override
+        public void onRepeatModeChanged(int repeatMode) {
+            super.onRepeatModeChanged(repeatMode);
+        }
+
+        @Override
+        public void onShuffleModeChanged(int shuffleMode) {
+            super.onShuffleModeChanged(shuffleMode);
+        }
+
+        @Override
+        public void binderDied() {
+            super.binderDied();
+        }
+
+        @Override
         public void onPlaybackStateChanged(PlaybackStateCompat state) {
             playbackState.postValue(state);
         }
@@ -112,7 +163,7 @@ public class MediaSessionClient {
 
         @Override
         public void onMetadataChanged(MediaMetadataCompat metadata) {
-
+            mediaMetadata.postValue(metadata);
         }
 
         @Override

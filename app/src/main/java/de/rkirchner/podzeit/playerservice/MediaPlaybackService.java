@@ -9,6 +9,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.AudioAttributesCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaBrowserServiceCompat;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -129,15 +130,6 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
                 new DefaultRenderersFactory(this),
                 new DefaultTrackSelector(adaptiveTrackSelectionFactory),
                 new DefaultLoadControl());
-
-//        String userAgent = Util.getUserAgent(this, "zeit");
-//        DefaultHttpDataSourceFactory defaultHttpDataSourceFactory =
-//                new DefaultHttpDataSourceFactory(userAgent);
-//        Uri uri = Uri.parse("https://cdn.podigee.com/media/podcast_1652_was_jetzt_episode_236_einwanderung_in_spanien_noch_kein_thema.mp3?v=1534734347&source=feed");
-//        MediaSource mediaSource = new ExtractorMediaSource.Factory(
-//                defaultHttpDataSourceFactory)
-//                .createMediaSource(uri);
-//        player.prepare(mediaSource);
     }
 
     @Override
@@ -154,6 +146,66 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     }
 
     private class MediaControllerCallback extends MediaControllerCompat.Callback {
+
+        @Override
+        public void onSessionReady() {
+            super.onSessionReady();
+        }
+
+        @Override
+        public void onSessionDestroyed() {
+            super.onSessionDestroyed();
+        }
+
+        @Override
+        public void onSessionEvent(String event, Bundle extras) {
+            super.onSessionEvent(event, extras);
+        }
+
+        @Override
+        public void onMetadataChanged(MediaMetadataCompat metadata) {
+            super.onMetadataChanged(metadata);
+        }
+
+        @Override
+        public void onQueueChanged(List<MediaSessionCompat.QueueItem> queue) {
+            super.onQueueChanged(queue);
+        }
+
+        @Override
+        public void onQueueTitleChanged(CharSequence title) {
+            super.onQueueTitleChanged(title);
+        }
+
+        @Override
+        public void onExtrasChanged(Bundle extras) {
+            super.onExtrasChanged(extras);
+        }
+
+        @Override
+        public void onAudioInfoChanged(MediaControllerCompat.PlaybackInfo info) {
+            super.onAudioInfoChanged(info);
+        }
+
+        @Override
+        public void onCaptioningEnabledChanged(boolean enabled) {
+            super.onCaptioningEnabledChanged(enabled);
+        }
+
+        @Override
+        public void onRepeatModeChanged(int repeatMode) {
+            super.onRepeatModeChanged(repeatMode);
+        }
+
+        @Override
+        public void onShuffleModeChanged(int shuffleMode) {
+            super.onShuffleModeChanged(shuffleMode);
+        }
+
+        @Override
+        public void binderDied() {
+            super.binderDied();
+        }
 
         @Override
         public void onPlaybackStateChanged(PlaybackStateCompat state) {

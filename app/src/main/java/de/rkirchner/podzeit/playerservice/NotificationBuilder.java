@@ -68,7 +68,6 @@ public class NotificationBuilder {
 
         MediaStyle mediaStyle = new MediaStyle()
                 .setMediaSession(mediaSession.getSessionToken())
-                .setShowActionsInCompactView(0)
                 .setShowCancelButton(true)
                 .setCancelButtonIntent(stopIntent);
 

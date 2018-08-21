@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import javax.inject.Inject;
@@ -19,6 +20,25 @@ public class PlayerViewModel extends ViewModel {
             playbackState.postValue(true);
         } else playbackState.postValue(false);
     };
+
+    private void test() {
+        mediaSessionClient.getMediaMetadata().observeForever(mediaMetadataCompat -> {
+            if (mediaMetadataCompat != null)
+                mediaMetadataCompat.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
+        });
+    }
+
+    public LiveData<MediaMetadataCompat> getMetadata() {
+        return mediaSessionClient.getMediaMetadata();
+    }
+
+    public LiveData<PlaybackStateCompat> getPlaybackState() {
+        return mediaSessionClient.getPlaybackState();
+    }
+
+    public void setPlayerToPosition(long position) {
+        mediaSessionClient.getMediaController().getTransportControls().seekTo(position);
+    }
 
     @Inject
     public PlayerViewModel(MediaSessionClient mediaSessionClient) {
