@@ -8,6 +8,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 
 public class PlaybackPreparerImpl implements MediaSessionConnector.PlaybackPreparer {
+
     @Override
     public long getSupportedPrepareActions() {
         return 0;

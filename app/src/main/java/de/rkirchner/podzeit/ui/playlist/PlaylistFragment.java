@@ -7,6 +7,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -52,6 +53,9 @@ public class PlaylistFragment extends DaggerFragment {
         itemTouchHelper = new ItemTouchHelper(itemTouchHelperCallback);
         itemTouchHelper.attachToRecyclerView(binding.playlistRv);
         adapter.registerOnStartDragListener(onStartDragListener);
+        adapter.registerPlaybackCallback(() -> {
+            MediaControllerCompat.getMediaController(getActivity()).getTransportControls().play();
+        });
         binding.playlistRv.setAdapter(adapter);
         binding.fab.setOnClickListener(view -> navigationController.navigateToSeriesGrid());
         return binding.getRoot();

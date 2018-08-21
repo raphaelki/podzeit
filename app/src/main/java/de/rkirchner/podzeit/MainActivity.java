@@ -1,7 +1,14 @@
 package de.rkirchner.podzeit;
 
+import android.content.ComponentName;
+import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.design.widget.NavigationView;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -12,6 +19,7 @@ import javax.inject.Inject;
 
 import dagger.android.support.DaggerAppCompatActivity;
 import de.rkirchner.podzeit.data.PodcastRepository;
+import de.rkirchner.podzeit.player.MediaPlaybackService;
 import de.rkirchner.podzeit.ui.common.NavigationController;
 
 public class MainActivity extends DaggerAppCompatActivity
@@ -22,6 +30,19 @@ public class MainActivity extends DaggerAppCompatActivity
 
     @Inject
     NavigationController navigationController;
+
+    MediaControllerCompat.Callback controllerCallback =
+            new MediaControllerCompat.Callback() {
+                @Override
+                public void onMetadataChanged(MediaMetadataCompat metadata) {
+                }
+
+                @Override
+                public void onPlaybackStateChanged(PlaybackStateCompat state) {
+                }
+            };
+    private MediaBrowserCompat mediaBrowser;
+    private MediaControllerCompat mediaController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +64,51 @@ public class MainActivity extends DaggerAppCompatActivity
             navigationController.navigateToPlaylist();
             podcastRepository.startFetch();
         }
+
+        createMediaBrowserService();
+    }
+
+    private void createMediaBrowserService() {
+//        MediaBrowserConnectionCallbacks callbacks = new MediaBrowserConnectionCallbacks(this);
+        MediaBrowserCompat.ConnectionCallback callbacks = new MediaBrowserCompat.ConnectionCallback() {
+
+            @Override
+            public void onConnected() {
+                try {
+                    mediaController = new MediaControllerCompat(MainActivity.this, mediaBrowser.getSessionToken());
+                    MediaControllerCompat.setMediaController(MainActivity.this, mediaController);
+                    mediaController.registerCallback(controllerCallback);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        ComponentName componentName = new ComponentName(this, MediaPlaybackService.class);
+        mediaBrowser = new MediaBrowserCompat(this, componentName, callbacks, null);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mediaBrowser.connect();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+
+        if (MediaControllerCompat.getMediaController(MainActivity.this) != null) {
+            MediaControllerCompat.getMediaController(MainActivity.this).unregisterCallback(controllerCallback);
+        }
+        mediaBrowser.disconnect();
+
     }
 
     @Override
