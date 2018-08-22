@@ -90,6 +90,7 @@ public class EpisodesPlaylistJoin {
                 && Objects.equals(size, object.size)
                 && Objects.equals(pubDate, object.pubDate)
                 && Objects.equals(wasPlayed, object.wasPlayed)
-                && Objects.equals(duration, object.duration);
+                && Objects.equals(duration, object.duration)
+                && Objects.equals(episodeId, object.episodeId);
     }
 }

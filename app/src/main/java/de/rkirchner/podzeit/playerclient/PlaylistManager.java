@@ -45,10 +45,6 @@ public class PlaylistManager {
         this.mediaSessionClient = mediaSessionClient;
         this.mediaSessionClient.getQueueItems().observeForever(queueItems -> {
             queue = queueItems;
-            Timber.d("Queue: ---");
-            for (QueueItem item : queueItems) {
-                Timber.d("Queue: %s - %s", item.getQueueId(), item.getDescription().getTitle().toString());
-            }
         });
         this.mediaSessionClient.getIsServiceConnected().observeForever(isServiceConnected -> {
             if (isServiceConnected != null && isServiceConnected) {

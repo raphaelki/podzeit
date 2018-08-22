@@ -111,7 +111,8 @@
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
             android:background="?selectableItemBackground"
-            android:src="@drawable/ic_playlist_add"
+            android:src="@{episode.episodeId == 0 ? @drawable/ic_playlist_add : @drawable/ic_playlist_add_check}"
+            tools:src="@drawable/ic_playlist_add"
             app:layout_constraintBottom_toTopOf="@id/episode_list_item_play_icon"
             app:layout_constraintEnd_toEndOf="@id/episode_list_item_right_guideline"
             app:layout_constraintTop_toTopOf="parent" />

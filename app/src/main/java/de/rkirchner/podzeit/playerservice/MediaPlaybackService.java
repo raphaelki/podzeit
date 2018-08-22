@@ -14,7 +14,6 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -208,8 +207,6 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
 
         @Override
         public void onPlaybackStateChanged(PlaybackStateCompat state) {
-
-            Log.d(LOG_TAG, "Playback state changed: " + state.getState());
             if (state.getState() == PlaybackStateCompat.STATE_PLAYING) {
                 startForeground(NOW_PLAYING_NOTIFICATION_ID, notificationBuilder.build());
                 isForeground = true;

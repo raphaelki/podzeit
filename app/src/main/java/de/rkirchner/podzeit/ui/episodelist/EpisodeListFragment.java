@@ -67,6 +67,7 @@ public class EpisodeListFragment extends DaggerFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adapter.setPlaylistListener(playlistListener);
+        adapter.setHasStableIds(true);
     }
 
     @Override

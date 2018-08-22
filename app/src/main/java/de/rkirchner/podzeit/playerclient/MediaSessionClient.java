@@ -154,6 +154,7 @@ public class MediaSessionClient {
         @Override
         public void onPlaybackStateChanged(PlaybackStateCompat state) {
             playbackState.postValue(state);
+            Timber.d("Playback state changed: %s", state.getState());
         }
 
         @Override

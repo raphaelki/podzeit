@@ -25,21 +25,17 @@ public class EpisodeListAdapter extends RecyclerViewListAdapter<EpisodeListItemB
     @Override
     public void onBindViewHolder(@NonNull BindingViewHolder<EpisodeListItemBinding> holder, int position) {
         EpisodesPlaylistJoin episode = getList().get(position);
-        setPlaylistAddIcon(episode.getEpisodeId() > 0, holder); // if episode is in playlist the episodeId is greater 0
         holder.binding().setEpisode(episode);
         holder.binding().setCallback(callback);
         holder.binding().setFormatter(formatterUtil);
         holder.binding().episodeListItemPlaylistAddIcon.setOnClickListener(
                 v -> {
                     if (episode.getEpisodeId() == 0) {
-                        episode.setEpisodeId(episode.getId());
                         playlistListener.onAddToPlaylist(episode.getId());
-                        setPlaylistAddIcon(true, holder);
                     } else {
                         playlistListener.onRemoveFromPlaylist(episode.getId());
-                        episode.setEpisodeId(0);
-                        setPlaylistAddIcon(false, holder);
                     }
+
                 });
         holder.binding().episodeListItemPlayIcon.setOnClickListener(v -> {
             playlistListener.onPlayNow(getList().get(position).getId());
@@ -56,7 +52,8 @@ public class EpisodeListAdapter extends RecyclerViewListAdapter<EpisodeListItemB
         this.playlistListener = playlistListener;
     }
 
-    private void setPlaylistAddIcon(boolean isAdded, BindingViewHolder<EpisodeListItemBinding> holder) {
-        holder.binding().episodeListItemPlaylistAddIcon.setImageResource(isAdded ? R.drawable.ic_playlist_add_check : R.drawable.ic_playlist_add);
+    @Override
+    public long getItemId(int position) {
+        return getList().get(position).getId();
     }
 }
