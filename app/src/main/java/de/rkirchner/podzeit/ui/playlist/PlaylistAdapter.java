@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.databinding.PlaylistItemBinding;
+import de.rkirchner.podzeit.playerclient.PlaylistManager;
 import de.rkirchner.podzeit.ui.common.BindingViewHolder;
 import de.rkirchner.podzeit.ui.common.FormatterUtil;
 import de.rkirchner.podzeit.ui.common.RecyclerViewListAdapter;

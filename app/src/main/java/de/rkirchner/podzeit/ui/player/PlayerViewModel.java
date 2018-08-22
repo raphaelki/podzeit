@@ -40,6 +40,22 @@ public class PlayerViewModel extends ViewModel {
         mediaSessionClient.getMediaController().getTransportControls().seekTo(position);
     }
 
+    public void fastForward() {
+        mediaSessionClient.getTransportControls().fastForward();
+    }
+
+    public void rewind() {
+        mediaSessionClient.getTransportControls().rewind();
+    }
+
+    public void skipToNext() {
+        mediaSessionClient.getTransportControls().skipToNext();
+    }
+
+    public void skipToPrevious() {
+        mediaSessionClient.getTransportControls().skipToPrevious();
+    }
+
     @Inject
     public PlayerViewModel(MediaSessionClient mediaSessionClient) {
         this.mediaSessionClient = mediaSessionClient;

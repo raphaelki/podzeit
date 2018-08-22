@@ -1,4 +1,4 @@
-package de.rkirchner.podzeit.ui.playlist;
+package de.rkirchner.podzeit.playerclient;
 
 import android.support.annotation.WorkerThread;
 
@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import de.rkirchner.podzeit.AppExecutors;
+import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.local.PlaylistDao;
 import de.rkirchner.podzeit.data.models.PlaylistEntry;
 
@@ -15,12 +16,22 @@ import de.rkirchner.podzeit.data.models.PlaylistEntry;
 public class PlaylistManager {
 
     private PlaylistDao playlistDao;
+    private EpisodeDao episodeDao;
     private AppExecutors appExecutors;
+    private MediaSessionClient mediaSessionClient;
 
     @Inject
-    public PlaylistManager(PlaylistDao playlistDao, AppExecutors appExecutors) {
-        this.appExecutors = appExecutors;
+    public PlaylistManager(PlaylistDao playlistDao, EpisodeDao episodeDao, AppExecutors appExecutors, MediaSessionClient mediaSessionClient) {
         this.playlistDao = playlistDao;
+        this.episodeDao = episodeDao;
+        this.appExecutors = appExecutors;
+        this.mediaSessionClient = mediaSessionClient;
+    }
+
+    public void playNow(int episodeId) {
+        appExecutors.diskIO().execute(() -> {
+//            mediaSessionClient.getMediaController().
+        });
     }
 
     public void addEpisodeToPlaylist(int episodeId) {

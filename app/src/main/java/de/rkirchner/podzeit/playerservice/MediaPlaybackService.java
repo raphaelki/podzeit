@@ -140,7 +140,6 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        Log.d(LOG_TAG, "onTaskRemoved");
         super.onTaskRemoved(rootIntent);
         stopSelf();
     }

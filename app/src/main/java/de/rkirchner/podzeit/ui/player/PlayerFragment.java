@@ -6,7 +6,6 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -23,7 +22,6 @@ import dagger.android.support.DaggerFragment;
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.databinding.FragmentPlayerBinding;
 import de.rkirchner.podzeit.ui.common.FormatterUtil;
-import timber.log.Timber;
 
 public class PlayerFragment extends DaggerFragment {
 
@@ -41,9 +39,7 @@ public class PlayerFragment extends DaggerFragment {
         // Required empty public constructor
     }
 
-    private Handler bufferingHandler = new Handler();
     private PlaybackStateCompat playbackState;
-    private long bufferUpdateTime = 500;
     private long duration = 0;
     private ValueAnimator progressAnimator;
 
@@ -59,6 +55,12 @@ public class PlayerFragment extends DaggerFragment {
         return binding.getRoot();
     }
 
+    private void setDuration(long duration) {
+        if (duration >= 0) {
+            this.duration = duration;
+        }
+    }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -69,10 +71,22 @@ public class PlayerFragment extends DaggerFragment {
                 binding.playerPlay.setImageResource(isPlaying ? R.drawable.exo_controls_pause : R.drawable.exo_controls_play);
             }
         });
+        binding.playerFfwd.setOnClickListener(v -> {
+            viewModel.fastForward();
+        });
+        binding.playerRew.setOnClickListener(v -> {
+            viewModel.rewind();
+        });
+        binding.playerNext.setOnClickListener(v -> {
+            viewModel.skipToNext();
+        });
+        binding.playerPrev.setOnClickListener(v -> {
+            viewModel.skipToPrevious();
+        });
         viewModel.getMetadata().observe(this, metadata -> {
             if (metadata != null) {
-                duration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
-                Timber.d("duration: %s", duration);
+                setDuration(metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
+                binding.playerTitle.setText(metadata.getText(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE));
                 binding.playerTimeBar.setDuration(duration);
             }
         });

@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.local.SeriesDao;
 import de.rkirchner.podzeit.data.models.Series;
-import de.rkirchner.podzeit.ui.playlist.PlaylistManager;
+import de.rkirchner.podzeit.playerclient.PlaylistManager;
 
 public class EpisodeListViewModel extends ViewModel {
 
