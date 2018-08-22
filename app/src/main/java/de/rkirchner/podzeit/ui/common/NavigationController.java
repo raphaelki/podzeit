@@ -6,14 +6,12 @@ import android.support.transition.Slide;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.Gravity;
 
 import javax.inject.Inject;
 
 import de.rkirchner.podzeit.MainActivity;
 import de.rkirchner.podzeit.R;
-import de.rkirchner.podzeit.playerclient.MediaSessionClient;
 import de.rkirchner.podzeit.ui.episodedetails.EpisodeDetailsFragment;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListClickCallback;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListFragment;
@@ -30,18 +28,11 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
     private final String PLAYER_FRAGMENT_TAG = "player_fragment";
     private Context context;
     private FragmentManager fragmentManager;
-    private MediaSessionClient mediaSessionClient;
 
     @Inject
-    public NavigationController(MainActivity activity, Context context, MediaSessionClient mediaSessionClient) {
+    public NavigationController(MainActivity activity, Context context) {
         this.fragmentManager = activity.getSupportFragmentManager();
         this.context = context;
-        this.mediaSessionClient = mediaSessionClient;
-        mediaSessionClient.getPlaybackState().observeForever(playbackStateCompat -> {
-            if (playbackStateCompat.getState() == PlaybackStateCompat.STATE_PLAYING) {
-                showPlayer();
-            } else hidePlayer();
-        });
     }
 
     private void showPlayer() {
