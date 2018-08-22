@@ -47,4 +47,8 @@ public class EpisodeListViewModel extends ViewModel {
     public void removeEpisodeFromPlaylist(int episodeId) {
         playlistManager.removeEpisodeFromPlaylist(episodeId);
     }
+
+    public void playNow(int episodeId) {
+        playlistManager.playNow(episodeId);
+    }
 }

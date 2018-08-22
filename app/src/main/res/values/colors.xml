@@ -5,4 +5,6 @@
     <color name="colorAccent">#ff6e40</color>
     <color name="player_control_tint">#000000</color>
     <color name="playlist_add_tint">#25ab00</color>
+    <color name="playlist_selected_color">#71c4ff</color>
+    <color name="playlist_background">#f2f2f2</color>
 </resources>

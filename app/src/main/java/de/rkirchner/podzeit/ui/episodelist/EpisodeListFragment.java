@@ -40,6 +40,11 @@ public class EpisodeListFragment extends DaggerFragment {
         public void onRemoveFromPlaylist(int episodeId) {
             viewModel.removeEpisodeFromPlaylist(episodeId);
         }
+
+        @Override
+        public void onPlayNow(int episodeId) {
+            viewModel.playNow(episodeId);
+        }
     };
 
     public EpisodeListFragment() {

@@ -25,7 +25,7 @@ public class EpisodeListAdapter extends RecyclerViewListAdapter<EpisodeListItemB
     @Override
     public void onBindViewHolder(@NonNull BindingViewHolder<EpisodeListItemBinding> holder, int position) {
         EpisodesPlaylistJoin episode = getList().get(position);
-        setPlaylistAddIcon(episode.getEpisodeId() > 0, holder);
+        setPlaylistAddIcon(episode.getEpisodeId() > 0, holder); // if episode is in playlist the episodeId is greater 0
         holder.binding().setEpisode(episode);
         holder.binding().setCallback(callback);
         holder.binding().setFormatter(formatterUtil);
@@ -41,6 +41,9 @@ public class EpisodeListAdapter extends RecyclerViewListAdapter<EpisodeListItemB
                         setPlaylistAddIcon(false, holder);
                     }
                 });
+        holder.binding().episodeListItemPlayIcon.setOnClickListener(v -> {
+            playlistListener.onPlayNow(getList().get(position).getId());
+        });
         holder.binding().executePendingBindings();
     }
 

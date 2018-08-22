@@ -14,10 +14,12 @@ import javax.inject.Inject;
 
 import de.rkirchner.podzeit.data.local.PlaylistDao;
 import de.rkirchner.podzeit.playerclient.MediaSessionClient;
+import de.rkirchner.podzeit.playerclient.PlaylistManager;
 
 public class PlaylistViewModel extends ViewModel {
 
     private PlaylistDao playlistDao;
+    private PlaylistManager playlistManager;
     private MediaSessionClient mediaSessionClient;
     private boolean playLastQueuedItem = false;
 
@@ -33,10 +35,11 @@ public class PlaylistViewModel extends ViewModel {
     };
 
     @Inject
-    public PlaylistViewModel(PlaylistDao playlistDao, MediaSessionClient mediaSessionClient) {
+    public PlaylistViewModel(PlaylistDao playlistDao, MediaSessionClient mediaSessionClient, PlaylistManager playlistManager) {
         this.playlistDao = playlistDao;
         this.mediaSessionClient = mediaSessionClient;
         this.mediaSessionClient.getQueueItems().observeForever(observer);
+        this.playlistManager = playlistManager;
     }
 
     public LiveData<List<EpisodePlaylistEntryJoin>> getPlaylistEpisodes() {
@@ -51,6 +54,10 @@ public class PlaylistViewModel extends ViewModel {
                 .build();
         mediaSessionClient.getMediaController().addQueueItem(mediaDescription);
         playLastQueuedItem = true;
+    }
+
+    public void startPlayback(int playlistPosition) {
+        playlistManager.playPlaylistEntry(playlistPosition);
     }
 
     @Override

@@ -58,6 +58,11 @@ public class PlaylistFragment extends DaggerFragment {
             public void onStartPlayback(EpisodePlaylistEntryJoin episode) {
                 viewModel.startPlayback(episode);
             }
+
+            @Override
+            public void onStartPlayback(int playlistPosition) {
+                viewModel.startPlayback(playlistPosition);
+            }
         });
         binding.playlistRv.setAdapter(adapter);
         binding.fab.setOnClickListener(view -> navigationController.navigateToSeriesGrid());

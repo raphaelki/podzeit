@@ -71,13 +71,14 @@ public class FormatterUtil {
 
     public String formatPubDate(String pubDate) {
         if (pubDate != null) {
-            pubDate = pubDate.substring(0, 16);
             try {
+                String shortPubDate = pubDate.substring(0, 16);
                 SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy", Locale.ENGLISH);
-                Date parsedDate = dateFormat.parse(pubDate);
+                Date parsedDate = dateFormat.parse(shortPubDate);
                 return DateFormat.getDateInstance(DateFormat.MEDIUM, getLocalFromConfig()).format(parsedDate);
-            } catch (ParseException e) {
-                e.printStackTrace();
+            } catch (ParseException | IndexOutOfBoundsException e) {
+                Timber.e("Could not parse pubDate: %s", e.getMessage());
+                return pubDate;
             }
         } else {
             Timber.w("pubDate is null");

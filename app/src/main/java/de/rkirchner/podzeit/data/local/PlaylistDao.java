@@ -37,7 +37,7 @@ public interface PlaylistDao {
     @Query(value = "SELECT * FROM playlist")
     LiveData<List<PlaylistEntry>> getPlaylistEntries();
 
-    @Query(value = "SELECT * FROM playlist")
+    @Query(value = "SELECT * FROM playlist ORDER BY playlistPosition ASC")
     List<PlaylistEntry> getPlaylistEntriesSync();
 
     @Update

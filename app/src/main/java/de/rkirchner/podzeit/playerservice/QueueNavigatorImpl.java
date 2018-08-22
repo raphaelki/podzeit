@@ -56,7 +56,7 @@ public class QueueNavigatorImpl implements MediaSessionConnector.QueueNavigator 
 
     @Override
     public void onSkipToPrevious(Player player) {
-
+        if (activeQueueItemId > 0) onSkipToQueueItem(player, activeQueueItemId - 1);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class QueueNavigatorImpl implements MediaSessionConnector.QueueNavigator 
 
     @Override
     public void onSkipToNext(Player player) {
-
+        onSkipToQueueItem(player, activeQueueItemId + 1);
     }
 
     @Override
