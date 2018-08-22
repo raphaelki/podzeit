@@ -24,6 +24,7 @@ public class QueueNavigatorImpl implements MediaSessionConnector.QueueNavigator 
     private MediaControllerCompat mediaController;
     private Context context;
     private SimpleExoPlayer exoPlayer;
+    private long activeQueueItemId;
 
     public QueueNavigatorImpl(MediaControllerCompat mediaController, Context context, SimpleExoPlayer exoPlayer) {
         this.mediaController = mediaController;
@@ -50,7 +51,7 @@ public class QueueNavigatorImpl implements MediaSessionConnector.QueueNavigator 
 
     @Override
     public long getActiveQueueItemId(@Nullable Player player) {
-        return 0;
+        return activeQueueItemId;
     }
 
     @Override
@@ -74,6 +75,7 @@ public class QueueNavigatorImpl implements MediaSessionConnector.QueueNavigator 
                     .createMediaSource(description.getMediaUri());
             exoPlayer.prepare(mediaSource);
             player.setPlayWhenReady(true);
+            activeQueueItemId = id;
         }
     }
 
