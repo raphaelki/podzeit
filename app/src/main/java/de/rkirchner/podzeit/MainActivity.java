@@ -40,7 +40,7 @@ public class MainActivity extends DaggerAppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         if (savedInstanceState == null) {
-            navigationController.onToggleVisibility(true);
+//            navigationController.onToggleVisibility(true);
             navigationController.navigateToPlaylist();
             podcastRepository.startFetch();
         }

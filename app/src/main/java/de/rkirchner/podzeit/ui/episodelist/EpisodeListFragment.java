@@ -17,6 +17,7 @@ import de.rkirchner.podzeit.Constants;
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.databinding.FragmentEpisodeListBinding;
 import de.rkirchner.podzeit.ui.common.FormatterUtil;
+import de.rkirchner.podzeit.ui.common.GlideRequestListener;
 
 public class EpisodeListFragment extends DaggerFragment {
 
@@ -30,6 +31,9 @@ public class EpisodeListFragment extends DaggerFragment {
     EpisodeListAdapter adapter;
     private FragmentEpisodeListBinding binding;
     private EpisodeListViewModel viewModel;
+    private GlideRequestListener glideRequestListener = () -> {
+        startPostponedEnterTransition();
+    };
     private PlaylistListener playlistListener = new PlaylistListener() {
         @Override
         public void onAddToPlaylist(int episodeId) {
@@ -68,7 +72,9 @@ public class EpisodeListFragment extends DaggerFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        postponeEnterTransition();
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_episode_list, container, false);
+        binding.setRequestListener(glideRequestListener);
         binding.episodeListRv.setAdapter(adapter);
         return binding.getRoot();
     }

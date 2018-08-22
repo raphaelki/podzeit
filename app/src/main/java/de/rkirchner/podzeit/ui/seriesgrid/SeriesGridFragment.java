@@ -16,6 +16,8 @@ import javax.inject.Inject;
 import dagger.android.support.DaggerFragment;
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.databinding.FragmentSeriesGridBinding;
+import de.rkirchner.podzeit.ui.common.GlideRequestListener;
+import timber.log.Timber;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,18 +31,32 @@ public class SeriesGridFragment extends DaggerFragment {
     private SeriesGridViewModel viewModel;
     private FragmentSeriesGridBinding binding;
     private SeriesGridAdapter gridAdapter;
+    private GlideRequestListener glideRequestListener = () -> startPostponedEnterTransition();
 
     public SeriesGridFragment() {
         // Required empty public constructor
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Timber.d("onCreate");
+        gridAdapter = new SeriesGridAdapter(seriesGridClickCallback, glideRequestListener);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        postponeEnterTransition();
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_series_grid, container, false);
-        gridAdapter = new SeriesGridAdapter(seriesGridClickCallback);
         binding.seriesGridRv.setAdapter(gridAdapter);
         return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Timber.d("onDestroy");
     }
 
     @Override

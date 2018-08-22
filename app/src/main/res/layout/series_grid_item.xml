@@ -4,6 +4,9 @@
     <data>
 
         <variable
+            name="requestListener"
+            type="de.rkirchner.podzeit.ui.common.GlideRequestListener" />
+        <variable
             name="series"
             type="de.rkirchner.podzeit.data.models.Series" />
 
@@ -15,6 +18,7 @@
     <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         imageUrl="@{series.thumbnailUrl}"
+        requestListener="@{requestListener}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"

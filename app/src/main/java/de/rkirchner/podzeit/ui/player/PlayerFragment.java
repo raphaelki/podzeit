@@ -28,8 +28,6 @@ public class PlayerFragment extends DaggerFragment {
     private FragmentPlayerBinding binding;
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-    @Inject
-    PlayerVisibilityListener playerVisibilityListener;
     private PlayerViewModel viewModel;
     private boolean isPlaying = false;
     @Inject

@@ -91,4 +91,10 @@ public class FormatterUtil {
             return context.getResources().getConfiguration().getLocales().get(0);
         } else return context.getResources().getConfiguration().locale;
     }
+
+    public String cutLongString(String string, int maxSize) {
+        if (string == null) return null;
+        if (string.length() >= maxSize) return string.substring(0, maxSize);
+        else return string;
+    }
 }

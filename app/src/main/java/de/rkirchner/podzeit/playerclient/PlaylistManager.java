@@ -68,8 +68,8 @@ public class PlaylistManager {
 
     public void playNow(int episodeId) {
         appExecutors.diskIO().execute(() -> {
-            addEpisodeToPlaylistInternal(episodeId);
-            mediaSessionClient.getTransportControls().skipToQueueItem(queue.size());
+            int playlistPosition = addEpisodeToPlaylistInternal(episodeId);
+            mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
         });
     }
 
@@ -111,10 +111,15 @@ public class PlaylistManager {
     }
 
     @WorkerThread
-    private void addEpisodeToPlaylistInternal(int episodeId) {
-        int currentEpisodeCount = playlistDao.getPlaylistEntriesSync().size();
-        playlistDao.insertEntry(new PlaylistEntry(episodeId, currentEpisodeCount));
-        mediaSessionClient.getMediaController().addQueueItem(getMetadata(episodeId));
+    private int addEpisodeToPlaylistInternal(int episodeId) {
+        // if already in the list just play episode at current position
+        PlaylistEntry playlistEntry = playlistDao.getPlaylistEntry(episodeId);
+        if (playlistEntry == null) {
+            int currentEpisodeCount = playlistDao.getPlaylistEntriesSync().size();
+            playlistDao.insertEntry(new PlaylistEntry(episodeId, currentEpisodeCount));
+            mediaSessionClient.getMediaController().addQueueItem(getMetadata(episodeId));
+            return queue == null ? 0 : queue.size();
+        } else return playlistEntry.getPlaylistPosition();
     }
 
     public void removeEpisodeFromPlaylistAtPlaylistPosition(int playlistPosition) {

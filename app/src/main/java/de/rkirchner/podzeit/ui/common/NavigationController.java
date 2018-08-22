@@ -1,14 +1,19 @@
 package de.rkirchner.podzeit.ui.common;
 
 import android.content.Context;
+import android.support.transition.Fade;
+import android.support.transition.Slide;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.media.session.PlaybackStateCompat;
+import android.view.Gravity;
 
 import javax.inject.Inject;
 
 import de.rkirchner.podzeit.MainActivity;
 import de.rkirchner.podzeit.R;
+import de.rkirchner.podzeit.playerclient.MediaSessionClient;
 import de.rkirchner.podzeit.ui.episodedetails.EpisodeDetailsFragment;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListClickCallback;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListFragment;
@@ -25,11 +30,18 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
     private final String PLAYER_FRAGMENT_TAG = "player_fragment";
     private Context context;
     private FragmentManager fragmentManager;
+    private MediaSessionClient mediaSessionClient;
 
     @Inject
-    public NavigationController(MainActivity activity, Context context) {
+    public NavigationController(MainActivity activity, Context context, MediaSessionClient mediaSessionClient) {
         this.fragmentManager = activity.getSupportFragmentManager();
         this.context = context;
+        this.mediaSessionClient = mediaSessionClient;
+        mediaSessionClient.getPlaybackState().observeForever(playbackStateCompat -> {
+            if (playbackStateCompat.getState() == PlaybackStateCompat.STATE_PLAYING) {
+                showPlayer();
+            } else hidePlayer();
+        });
     }
 
     private void showPlayer() {
@@ -53,28 +65,40 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
     }
 
     public void navigateToPlaylist() {
+        PlaylistFragment fragment = new PlaylistFragment();
+        setTransitions(fragment);
         fragmentManager.beginTransaction()
-                .replace(UPPER_FRAGMENT_FRAME_ID, new PlaylistFragment())
+                .setReorderingAllowed(true)
+                .replace(UPPER_FRAGMENT_FRAME_ID, fragment)
                 .commit();
     }
 
     public void navigateToSeriesGrid() {
+        SeriesGridFragment fragment = new SeriesGridFragment();
+        setTransitions(fragment);
         fragmentManager.beginTransaction()
-                .replace(UPPER_FRAGMENT_FRAME_ID, new SeriesGridFragment())
+                .setReorderingAllowed(true)
+                .replace(UPPER_FRAGMENT_FRAME_ID, fragment)
                 .addToBackStack(null)
                 .commit();
     }
 
     private void navigateToEpisodeList(String rssUrl) {
+        Fragment fragment = EpisodeListFragment.create(rssUrl);
+        setTransitions(fragment);
         fragmentManager.beginTransaction()
-                .replace(UPPER_FRAGMENT_FRAME_ID, EpisodeListFragment.create(rssUrl))
+                .setReorderingAllowed(true)
+                .replace(UPPER_FRAGMENT_FRAME_ID, fragment)
                 .addToBackStack(null)
                 .commit();
     }
 
     private void navigateToEpisodeDetails(int episodeId) {
+        Fragment fragment = EpisodeDetailsFragment.create(episodeId);
+        setTransitions(fragment);
         fragmentManager.beginTransaction()
-                .replace(UPPER_FRAGMENT_FRAME_ID, EpisodeDetailsFragment.create(episodeId))
+                .setReorderingAllowed(true)
+                .replace(UPPER_FRAGMENT_FRAME_ID, fragment)
                 .addToBackStack(null)
                 .commit();
     }
@@ -93,5 +117,10 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
     public void onToggleVisibility(boolean showPlayer) {
         if (showPlayer) showPlayer();
         else hidePlayer();
+    }
+
+    private void setTransitions(Fragment fragment) {
+        fragment.setExitTransition(new Fade());
+        fragment.setEnterTransition(new Slide(Gravity.RIGHT));
     }
 }

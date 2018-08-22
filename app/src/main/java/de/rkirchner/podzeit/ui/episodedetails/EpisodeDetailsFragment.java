@@ -17,6 +17,7 @@ import de.rkirchner.podzeit.Constants;
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.databinding.FragmentEpisodeDetailsBinding;
 import de.rkirchner.podzeit.ui.common.FormatterUtil;
+import de.rkirchner.podzeit.ui.episodelist.EpisodesPlaylistJoin;
 
 public class EpisodeDetailsFragment extends DaggerFragment {
 
@@ -25,6 +26,7 @@ public class EpisodeDetailsFragment extends DaggerFragment {
     @Inject
     FormatterUtil formatterUtil;
     private FragmentEpisodeDetailsBinding binding;
+    private EpisodesPlaylistJoin episode;
 
     public EpisodeDetailsFragment() {
         // Required empty public constructor
@@ -55,7 +57,26 @@ public class EpisodeDetailsFragment extends DaggerFragment {
             viewModel.setEpisodeId(getArguments().getInt(Constants.EPISODE_ID_KEY));
         }
         viewModel.getEpisode().observe(this, episode -> {
-            if (episode != null) binding.setEpisode(episode);
+            if (episode != null) {
+                this.episode = episode;
+                binding.setEpisode(episode);
+            }
         });
+        binding.episodeDetailsItemPlayIcon.setOnClickListener(v -> {
+            viewModel.playEpisode();
+        });
+        binding.episodeDetailsItemPlaylistAddIcon.setOnClickListener(
+                v -> {
+                    if (episode == null) return;
+                    if (episode.getEpisodeId() == 0) {
+                        episode.setEpisodeId(episode.getId());
+                        viewModel.addToPlaylist();
+//                        setPlaylistAddIcon(true);
+                    } else {
+                        viewModel.removeFromPlaylist();
+                        episode.setEpisodeId(0);
+//                        setPlaylistAddIcon(false);
+                    }
+                });
     }
 }
