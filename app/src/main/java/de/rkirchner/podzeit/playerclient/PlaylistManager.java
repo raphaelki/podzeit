@@ -1,18 +1,26 @@
 package de.rkirchner.podzeit.playerclient;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.WorkerThread;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.session.MediaSessionCompat.QueueItem;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import de.rkirchner.podzeit.AppExecutors;
 import de.rkirchner.podzeit.Constants;
+import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.local.PlaylistDao;
 import de.rkirchner.podzeit.data.models.PlaylistEntry;
@@ -26,10 +34,12 @@ public class PlaylistManager {
     private AppExecutors appExecutors;
     private MediaSessionClient mediaSessionClient;
     private List<QueueItem> queue;
+    private Context context;
 
     @Inject
-    public PlaylistManager(PlaylistDao playlistDao, EpisodeDao episodeDao, AppExecutors appExecutors, MediaSessionClient mediaSessionClient) {
+    public PlaylistManager(PlaylistDao playlistDao, EpisodeDao episodeDao, AppExecutors appExecutors, MediaSessionClient mediaSessionClient, Context context) {
         this.playlistDao = playlistDao;
+        this.context = context;
         this.episodeDao = episodeDao;
         this.appExecutors = appExecutors;
         this.mediaSessionClient = mediaSessionClient;
@@ -70,12 +80,27 @@ public class PlaylistManager {
     @WorkerThread
     private MediaDescriptionCompat getMetadata(int episodeId) {
         MetadataJoin episode = episodeDao.getEpisodeSync(episodeId);
+        RequestOptions requestOptions = new RequestOptions()
+                .fallback(R.drawable.ic_music_note_black_144dp)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
+        Bitmap bitmap = null;
+        try {
+            bitmap = Glide.with(context)
+                    .applyDefaultRequestOptions(requestOptions)
+                    .asBitmap()
+                    .load(episode.getThumbnailUrl())
+                    .submit(144, 144)
+                    .get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
         return new MediaDescriptionCompat.Builder()
                 .setTitle(episode.getEpisodeTitle())
                 .setMediaId(episode.getUrl())
                 .setMediaUri(Uri.parse(episode.getUrl()))
                 .setIconUri(Uri.parse(episode.getThumbnailUrl()))
-                .setDescription(episode.getSummary())
+                .setIconBitmap(bitmap)
+                .setDescription(episode.getSeriesTitle())
                 .build();
     }
 

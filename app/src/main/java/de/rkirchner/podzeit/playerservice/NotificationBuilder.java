@@ -52,16 +52,24 @@ public class NotificationBuilder {
         NotificationCompat.Action pauseAction = new NotificationCompat.Action(R.drawable.exo_controls_pause,
                 "Pause", MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PAUSE));
 
+        NotificationCompat.Action previousAction = new NotificationCompat.Action(R.drawable.exo_controls_previous,
+                "Previous", MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS));
+
+        NotificationCompat.Action nextAction = new NotificationCompat.Action(R.drawable.exo_controls_next,
+                "Next", MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_SKIP_TO_NEXT));
+
         MediaMetadataCompat mediaMetadata = mediaController.getMetadata();
         MediaDescriptionCompat description = mediaMetadata.getDescription();
         PlaybackStateCompat playbackState = mediaController.getPlaybackState();
 
+        builder.addAction(previousAction);
         int playbackStateActions = playbackState.getState();
         if (playbackStateActions == PlaybackStateCompat.STATE_PLAYING) {
             builder.addAction(pauseAction);
         } else if (playbackStateActions == PlaybackStateCompat.STATE_PAUSED) {
             builder.addAction(playAction);
         }
+        builder.addAction(nextAction);
 
         PendingIntent stopIntent = MediaButtonReceiver.buildMediaButtonPendingIntent(context,
                 PlaybackStateCompat.ACTION_STOP);
@@ -74,6 +82,7 @@ public class NotificationBuilder {
         builder.setContentTitle(description.getTitle())
                 .setContentText(description.getSubtitle())
                 .setSubText(description.getDescription())
+                .setContentTitle(description.getTitle())
                 .setLargeIcon(description.getIconBitmap())
                 .setContentIntent(mediaController.getSessionActivity())
                 .setSmallIcon(R.drawable.ic_play_circle_outline)
