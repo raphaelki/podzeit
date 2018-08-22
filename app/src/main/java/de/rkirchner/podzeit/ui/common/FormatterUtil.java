@@ -38,6 +38,16 @@ public class FormatterUtil {
         return formattedSize + " MB";
     }
 
+    public String formatMillisecondsDuration(int duration) {
+        duration = duration / 1000;
+        int hours = duration / 3600;
+        int minutes = (duration / 60) % 60;
+        int seconds = duration % 60;
+        if (hours > 0)
+            return String.format(getLocalFromConfig(), "%02d:%02d:%02d", hours, minutes, seconds);
+        else return String.format(getLocalFromConfig(), "%02d:%02d", minutes, seconds);
+    }
+
     public String formatDuration(String duration) {
         if (duration == null) {
             Timber.w("Duration is null");

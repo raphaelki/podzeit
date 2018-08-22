@@ -22,6 +22,8 @@ import javax.inject.Inject;
 import dagger.android.support.DaggerFragment;
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.databinding.FragmentPlayerBinding;
+import de.rkirchner.podzeit.ui.common.FormatterUtil;
+import timber.log.Timber;
 
 public class PlayerFragment extends DaggerFragment {
 
@@ -32,6 +34,8 @@ public class PlayerFragment extends DaggerFragment {
     PlayerVisibilityListener playerVisibilityListener;
     private PlayerViewModel viewModel;
     private boolean isPlaying = false;
+    @Inject
+    FormatterUtil formatterUtil;
 
     public PlayerFragment() {
         // Required empty public constructor
@@ -68,6 +72,7 @@ public class PlayerFragment extends DaggerFragment {
         viewModel.getMetadata().observe(this, metadata -> {
             if (metadata != null) {
                 duration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
+                Timber.d("duration: %s", duration);
                 binding.playerTimeBar.setDuration(duration);
             }
         });
@@ -102,26 +107,16 @@ public class PlayerFragment extends DaggerFragment {
         });
     }
 
-    private void setupBufferingPositionHandler() {
-        bufferingHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (playbackState != null)
-                    binding.playerTimeBar.setBufferedPosition(playbackState.getBufferedPosition());
-                bufferingHandler.postDelayed(this, bufferUpdateTime);
-            }
-        }, bufferUpdateTime);
-    }
-
     private void setupMediaBarAnimation(long position, float playbackSpeed) {
         final int timeToEnd = (int) ((duration - position) / playbackSpeed);
         progressAnimator = ValueAnimator.ofInt((int) position, (int) duration).setDuration(timeToEnd);
         progressAnimator.setInterpolator(new LinearInterpolator());
         progressAnimator.addUpdateListener((ValueAnimator animation) -> {
-            binding.playerTimeBar.setPosition((int) animation.getAnimatedValue());
+            int timeElapsed = (int) animation.getAnimatedValue();
+            binding.playerTimeBar.setPosition(timeElapsed);
+            binding.playerTimeElapsed.setText(formatterUtil.formatMillisecondsDuration(timeElapsed));
+            binding.playerTimeLeft.setText(String.format("-%s", formatterUtil.formatMillisecondsDuration((int) duration - timeElapsed)));
         });
         progressAnimator.start();
     }
-
-
 }
