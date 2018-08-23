@@ -5,6 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 import java.util.Objects;
 
@@ -16,7 +17,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 parentColumns = "rss_url",
                 childColumns = "series_rss_url",
                 onDelete = CASCADE),
-        indices = {@Index(value = "series_rss_url")},
+        indices = {@Index(value = "id"), @Index(value = "url", unique = true), @Index(value = "series_rss_url")},
         tableName = "podcast_episodes")
 public class Episode {
 
@@ -25,6 +26,7 @@ public class Episode {
     private String title;
     private String subtitle;
     private String summary;
+    @NonNull
     private String url;
     private String duration;
     private String pubDate;
@@ -112,11 +114,12 @@ public class Episode {
         this.summary = summary;
     }
 
+    @NonNull
     public String getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(@NonNull String url) {
         this.url = url;
     }
 
