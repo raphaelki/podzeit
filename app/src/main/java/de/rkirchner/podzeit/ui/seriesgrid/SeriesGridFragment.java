@@ -54,15 +54,22 @@ public class SeriesGridFragment extends DaggerFragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Timber.d("onDestroy");
-    }
-
-    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(SeriesGridViewModel.class);
         viewModel.getSeriesList().observe(this, seriesList -> gridAdapter.swapList(seriesList));
+        binding.seriesGridRefresh.setOnRefreshListener(() -> viewModel.triggerRefresh());
+        viewModel.getRefreshDataState().observe(this, dataState -> {
+            if (dataState != null) {
+                switch (dataState) {
+                    case REFRESHING:
+                        binding.seriesGridRefresh.setRefreshing(true);
+                        break;
+                    default:
+                        binding.seriesGridRefresh.setRefreshing(false);
+                        break;
+                }
+            }
+        });
     }
 }

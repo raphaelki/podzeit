@@ -80,6 +80,10 @@ public class PlaylistManager {
     @WorkerThread
     private MediaDescriptionCompat getMetadata(int episodeId) {
         MetadataJoin episode = episodeDao.getEpisodeSync(episodeId);
+        if (episode == null) {
+            Timber.d("Could not find episode with id %s", episodeId);
+            return null;
+        }
         RequestOptions requestOptions = new RequestOptions()
                 .fallback(R.drawable.ic_music_note_black_144dp)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE);
@@ -91,8 +95,8 @@ public class PlaylistManager {
                     .load(episode.getThumbnailUrl())
                     .submit(144, 144)
                     .get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+        } catch (InterruptedException | ExecutionException | NullPointerException e) {
+            Timber.e("Could not load thumbnail for episodeId: %s", episodeId);
         }
         return new MediaDescriptionCompat.Builder()
                 .setTitle(episode.getEpisodeTitle())

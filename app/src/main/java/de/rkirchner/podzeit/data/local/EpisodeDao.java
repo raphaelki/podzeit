@@ -16,10 +16,10 @@ import de.rkirchner.podzeit.ui.episodelist.EpisodesPlaylistJoin;
 @Dao
 public interface EpisodeDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertEpisode(Episode episode);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertEpisodeList(List<Episode> episodeList);
 
     @Query(value = "SELECT * FROM podcast_episodes WHERE series_rss_url = :rssUrl")
@@ -60,4 +60,7 @@ public interface EpisodeDao {
                     "LEFT JOIN playlist ON playlist.episodeId = podcast_episodes.id " +
                     "WHERE id = :episodeId")
     LiveData<EpisodesPlaylistJoin> getEpisodesPlaylistJoinForEpisode(int episodeId);
+
+    @Query(value = "SELECT COUNT(*) FROM podcast_episodes WHERE series_rss_url = :rssSeriesUrl")
+    int getEpisodeCount(String rssSeriesUrl);
 }

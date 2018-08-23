@@ -88,6 +88,21 @@ public class EpisodeListFragment extends DaggerFragment {
             String seriesRssUrl = getArguments().getString(Constants.RSS_URL_KEY);
             viewModel.setSeries(seriesRssUrl);
         }
+        binding.episodeListSwipeToRefresh.setOnRefreshListener(() -> {
+            viewModel.triggerRefresh();
+        });
+        viewModel.getRefreshStatus().observe(this, status -> {
+            if (status != null) {
+                switch (status) {
+                    case REFRESHING:
+                        binding.episodeListSwipeToRefresh.setRefreshing(true);
+                        break;
+                    default:
+                        binding.episodeListSwipeToRefresh.setRefreshing(false);
+                        break;
+                }
+            }
+        });
         viewModel.getSeries().observe(this, binding::setSeries);
         viewModel.getEpisodes().observe(this, adapter::swapList);
     }

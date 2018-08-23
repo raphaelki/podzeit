@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import de.rkirchner.podzeit.data.DataState;
 import de.rkirchner.podzeit.data.PodcastRepository;
 import de.rkirchner.podzeit.data.models.Series;
 
@@ -21,5 +22,13 @@ public class SeriesGridViewModel extends ViewModel {
 
     public LiveData<List<Series>> getSeriesList() {
         return repository.getSeriesList();
+    }
+
+    public void triggerRefresh() {
+        repository.triggerCompleteRefresh();
+    }
+
+    public LiveData<DataState> getRefreshDataState() {
+        return repository.getRefreshDataState();
     }
 }

@@ -10,6 +10,7 @@ import android.support.annotation.WorkerThread;
 import android.support.v4.app.JobIntentService;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -18,6 +19,7 @@ import javax.inject.Inject;
 import dagger.android.AndroidInjection;
 import de.rkirchner.podzeit.Constants;
 import de.rkirchner.podzeit.R;
+import de.rkirchner.podzeit.data.FetchStatusBroadcaster;
 import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.local.SeriesDao;
 import de.rkirchner.podzeit.data.models.Episode;
@@ -32,11 +34,14 @@ public class FetchService extends JobIntentService {
     public final String CONTENT_UPDATE_CHANNEL_ID = "refresh_content";
     public final int UPDATE_NOTIFICATION_ID = 83458;
     @Inject
+    FetchStatusBroadcaster fetchStatusBroadcaster;
+    @Inject
     SeriesDao seriesDao;
     @Inject
     EpisodeDao episodeDao;
     @Inject
     Retrofit.Builder retrofitBuilder;
+    private int totalNewEpisodeCount = 0;
     private NotificationManagerCompat notificationManager;
     private NotificationCompat.Builder notificationBuilder;
     private int jobDone = 0;
@@ -50,7 +55,9 @@ public class FetchService extends JobIntentService {
     protected void onHandleWork(@NonNull Intent intent) {
         if (intent.hasExtra(Constants.RSS_URL_KEY)) {
             String url = intent.getStringExtra(Constants.RSS_URL_KEY);
+            fetchStatusBroadcaster.fireBroadcast(Constants.FETCH_SERVICE_EPISODES_STARTED);
             startFetchForUrl(url);
+            fetchStatusBroadcaster.fireBroadcast(Constants.FETCH_SERVICE_EPISODES_FINISHED);
         }
     }
 
@@ -65,6 +72,9 @@ public class FetchService extends JobIntentService {
     @Override
     public void onDestroy() {
         Timber.d("All work done. Shutting down service.");
+        if (totalNewEpisodeCount > 0) {
+            Toast.makeText(this, "Fetched " + totalNewEpisodeCount + " new episodes", Toast.LENGTH_LONG).show();
+        }
         notificationManager.cancel(UPDATE_NOTIFICATION_ID);
         super.onDestroy();
     }
@@ -79,8 +89,12 @@ public class FetchService extends JobIntentService {
                 episode.setSeriesRssUrl(url);
             }
             seriesDao.insertSeries(series);
+            int episodesBeforeInsertion = episodeDao.getEpisodeCount(url);
             episodeDao.insertEpisodeList(series.getEpisodes());
-            Timber.d("Fetched series %s with %s episodes.", series.getTitle(), series.getEpisodeCount());
+            int episodesAfterInsertion = episodeDao.getEpisodeCount(url);
+            int newEpisodeCount = episodesAfterInsertion - episodesBeforeInsertion;
+            totalNewEpisodeCount += newEpisodeCount;
+            Timber.d("Fetched series %s with %s episodes. Inserted %s new episodes into database.", series.getTitle(), series.getEpisodeCount(), newEpisodeCount);
             notificationBuilder.setProgress(jobCount, jobDone, false);
             notificationManager.notify(UPDATE_NOTIFICATION_ID, notificationBuilder.build());
         } catch (IOException e) {

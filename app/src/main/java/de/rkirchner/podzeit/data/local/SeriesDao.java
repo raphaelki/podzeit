@@ -13,13 +13,13 @@ import de.rkirchner.podzeit.data.models.Series;
 @Dao
 public interface SeriesDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertSeriesList(List<Series> seriesList);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertSeries(Series series);
 
-    @Query("SELECT * FROM podcast_series")
+    @Query("SELECT * FROM podcast_series ORDER BY podcast_series.title")
     LiveData<List<Series>> getAllSeries();
 
     @Query("SELECT * FROM podcast_series")

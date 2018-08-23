@@ -9,27 +9,25 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import de.rkirchner.podzeit.data.local.EpisodeDao;
-import de.rkirchner.podzeit.data.local.SeriesDao;
+import de.rkirchner.podzeit.data.DataState;
+import de.rkirchner.podzeit.data.PodcastRepository;
 import de.rkirchner.podzeit.data.models.Series;
 import de.rkirchner.podzeit.playerclient.PlaylistManager;
 
 public class EpisodeListViewModel extends ViewModel {
 
     private final MutableLiveData<String> seriesRssUrl = new MutableLiveData<>();
-    private EpisodeDao episodeDao;
-    private SeriesDao seriesDao;
+    private PodcastRepository repository;
     private PlaylistManager playlistManager;
 
     @Inject
-    public EpisodeListViewModel(EpisodeDao episodeDao, SeriesDao seriesDao, PlaylistManager playlistManager) {
-        this.episodeDao = episodeDao;
-        this.seriesDao = seriesDao;
+    public EpisodeListViewModel(PodcastRepository repository, PlaylistManager playlistManager) {
+        this.repository = repository;
         this.playlistManager = playlistManager;
     }
 
     public LiveData<Series> getSeries() {
-        return Transformations.switchMap(seriesRssUrl, rssUrl -> seriesDao.getSeries(rssUrl));
+        return Transformations.switchMap(seriesRssUrl, rssUrl -> repository.getSeries(rssUrl));
     }
 
     public void setSeries(String rssUrl) {
@@ -37,7 +35,7 @@ public class EpisodeListViewModel extends ViewModel {
     }
 
     public LiveData<List<EpisodesPlaylistJoin>> getEpisodes() {
-        return Transformations.switchMap(seriesRssUrl, rssUrl -> episodeDao.getEpisodesPlaylistJoinForSeries(rssUrl));
+        return Transformations.switchMap(seriesRssUrl, rssUrl -> repository.getEpisodesPlaylistJoinForSeries(rssUrl));
     }
 
     public void addEpisodeToPlaylist(int episodeId) {
@@ -50,5 +48,13 @@ public class EpisodeListViewModel extends ViewModel {
 
     public void playNow(int episodeId) {
         playlistManager.playNow(episodeId);
+    }
+
+    public void triggerRefresh() {
+        repository.triggerRefreshForRssUrl(seriesRssUrl.getValue());
+    }
+
+    public LiveData<DataState> getRefreshStatus() {
+        return repository.getRefreshDataState();
     }
 }
