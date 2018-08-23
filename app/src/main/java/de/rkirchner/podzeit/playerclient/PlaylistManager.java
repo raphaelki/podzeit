@@ -60,13 +60,14 @@ public class PlaylistManager {
             for (PlaylistEntry entry : playlistEntries) {
                 mediaSessionClient.getMediaController().addQueueItem(getMetadata(entry.getEpisodeId()), entry.getPlaylistPosition());
             }
+            mediaSessionClient.getTransportControls().skipToQueueItem(0);
         });
     }
 
     public void playNow(int episodeId) {
         appExecutors.diskIO().execute(() -> {
             int playlistPosition = addEpisodeToPlaylistInternal(episodeId);
-//            mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
+            mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
             mediaSessionClient.getTransportControls().play();
         });
     }
@@ -74,11 +75,6 @@ public class PlaylistManager {
     public void playPlaylistEntry(int playlistPosition) {
         mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
         mediaSessionClient.getTransportControls().play();
-//        appExecutors.diskIO().execute(()->{
-//            PlaylistEntry entry = playlistDao.getPlaylistEntryAtPosition(playlistPosition);
-//            Episode episode = episodeDao.getEpisodeForId(entry.getEpisodeId());
-//            mediaSessionClient.getTransportControls().playFromMediaId(episode.getUrl(), null);
-//        });
     }
 
     @WorkerThread
@@ -121,7 +117,7 @@ public class PlaylistManager {
         if (playlistEntry == null) {
             int currentEpisodeCount = playlistDao.getPlaylistEntriesSync().size();
             playlistDao.insertEntry(new PlaylistEntry(episodeId, currentEpisodeCount));
-            mediaSessionClient.getMediaController().addQueueItem(getMetadata(episodeId));
+            mediaSessionClient.getMediaController().addQueueItem(getMetadata(episodeId), currentEpisodeCount);
             return currentEpisodeCount;
         } else return playlistEntry.getPlaylistPosition();
     }
