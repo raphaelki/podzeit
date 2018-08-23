@@ -11,6 +11,7 @@ import android.support.v4.media.session.MediaSessionCompat.QueueItem;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.exoplayer2.ext.mediasession.TimelineQueueEditor;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -19,10 +20,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import de.rkirchner.podzeit.AppExecutors;
-import de.rkirchner.podzeit.Constants;
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.local.PlaylistDao;
+import de.rkirchner.podzeit.data.models.Episode;
 import de.rkirchner.podzeit.data.models.PlaylistEntry;
 import timber.log.Timber;
 
@@ -57,7 +58,7 @@ public class PlaylistManager {
         appExecutors.diskIO().execute(() -> {
             List<PlaylistEntry> playlistEntries = playlistDao.getPlaylistEntriesSync();
             for (PlaylistEntry entry : playlistEntries) {
-                mediaSessionClient.getMediaController().addQueueItem(getMetadata(entry.getEpisodeId()));
+                mediaSessionClient.getMediaController().addQueueItem(getMetadata(entry.getEpisodeId()), entry.getPlaylistPosition());
             }
         });
     }
@@ -65,12 +66,19 @@ public class PlaylistManager {
     public void playNow(int episodeId) {
         appExecutors.diskIO().execute(() -> {
             int playlistPosition = addEpisodeToPlaylistInternal(episodeId);
-            mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
+//            mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
+            mediaSessionClient.getTransportControls().play();
         });
     }
 
     public void playPlaylistEntry(int playlistPosition) {
         mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
+        mediaSessionClient.getTransportControls().play();
+//        appExecutors.diskIO().execute(()->{
+//            PlaylistEntry entry = playlistDao.getPlaylistEntryAtPosition(playlistPosition);
+//            Episode episode = episodeDao.getEpisodeForId(entry.getEpisodeId());
+//            mediaSessionClient.getTransportControls().playFromMediaId(episode.getUrl(), null);
+//        });
     }
 
     @WorkerThread
@@ -114,7 +122,7 @@ public class PlaylistManager {
             int currentEpisodeCount = playlistDao.getPlaylistEntriesSync().size();
             playlistDao.insertEntry(new PlaylistEntry(episodeId, currentEpisodeCount));
             mediaSessionClient.getMediaController().addQueueItem(getMetadata(episodeId));
-            return queue == null ? 0 : queue.size();
+            return currentEpisodeCount;
         } else return playlistEntry.getPlaylistPosition();
     }
 
@@ -157,9 +165,9 @@ public class PlaylistManager {
 
     private void reorderMediaQueue(int startPosition, int endPosition) {
         Bundle bundle = new Bundle();
-        bundle.putInt(Constants.QUEUE_REORDER_START_POSITION_KEY, startPosition);
-        bundle.putInt(Constants.QUEUE_REORDER_END_POSITION_KEY, endPosition);
-        mediaSessionClient.getMediaController().sendCommand(Constants.QUEUE_REORDER_COMMAND_KEY, bundle, null);
+        bundle.putInt(TimelineQueueEditor.EXTRA_FROM_INDEX, startPosition);
+        bundle.putInt(TimelineQueueEditor.EXTRA_TO_INDEX, endPosition);
+        mediaSessionClient.getMediaController().sendCommand(TimelineQueueEditor.COMMAND_MOVE_QUEUE_ITEM, bundle, null);
     }
 
     @WorkerThread
@@ -171,5 +179,18 @@ public class PlaylistManager {
         playlistDao.updateEntries(entriesToReorder);
         playlistDao.removeEpisodeFromPlaylist(entry);
         mediaSessionClient.getMediaController().removeQueueItem(getMetadata(entry.getEpisodeId()));
+    }
+
+    public void currentEpisodeFinished(String mediaId) {
+        appExecutors.diskIO().execute(() -> {
+            for (QueueItem item : queue) {
+                if (item.getDescription().getMediaId().equals(mediaId)) {
+                    Episode episode = episodeDao.getEpisodeForUrl(mediaId);
+                    episode.setWasPlayed(true);
+                    episodeDao.updateEpisode(episode);
+                    break;
+                }
+            }
+        });
     }
 }

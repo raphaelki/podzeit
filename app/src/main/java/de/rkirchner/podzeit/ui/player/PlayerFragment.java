@@ -21,7 +21,9 @@ import javax.inject.Inject;
 import dagger.android.support.DaggerFragment;
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.databinding.FragmentPlayerBinding;
+import de.rkirchner.podzeit.playerclient.PlaylistManager;
 import de.rkirchner.podzeit.ui.common.FormatterUtil;
+import timber.log.Timber;
 
 public class PlayerFragment extends DaggerFragment {
 
@@ -31,12 +33,15 @@ public class PlayerFragment extends DaggerFragment {
     private PlayerViewModel viewModel;
     private boolean isPlaying = false;
     @Inject
+    PlaylistManager playlistManager;
+    @Inject
     FormatterUtil formatterUtil;
 
     public PlayerFragment() {
         // Required empty public constructor
     }
 
+    private MediaMetadataCompat metadata;
     private PlaybackStateCompat playbackState;
     private long duration = 0;
     private ValueAnimator progressAnimator;
@@ -83,6 +88,7 @@ public class PlayerFragment extends DaggerFragment {
         });
         viewModel.getMetadata().observe(this, metadata -> {
             if (metadata != null) {
+                this.metadata = metadata;
                 setDuration(metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
                 binding.playerTitle.setText(metadata.getText(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE));
                 binding.playerTimeBar.setDuration(duration);
@@ -121,6 +127,11 @@ public class PlayerFragment extends DaggerFragment {
 
     private void setupMediaBarAnimation(long position, float playbackSpeed) {
         final int timeToEnd = (int) ((duration - position) / playbackSpeed);
+        Timber.d("duration: %s, position: %s, playbackSpeed: %s", duration, position, playbackSpeed);
+        if (position > duration) {
+            onEpisodeFinished();
+            return;
+        }
         progressAnimator = ValueAnimator.ofInt((int) position, (int) duration).setDuration(timeToEnd);
         progressAnimator.setInterpolator(new LinearInterpolator());
         progressAnimator.addUpdateListener((ValueAnimator animation) -> {
@@ -128,7 +139,15 @@ public class PlayerFragment extends DaggerFragment {
             binding.playerTimeBar.setPosition(timeElapsed);
             binding.playerTimeElapsed.setText(formatterUtil.formatMillisecondsDuration(timeElapsed));
             binding.playerTimeLeft.setText(String.format("-%s", formatterUtil.formatMillisecondsDuration((int) duration - timeElapsed)));
+            if (timeElapsed == duration) {
+                onEpisodeFinished();
+            }
         });
         progressAnimator.start();
+    }
+
+    private void onEpisodeFinished() {
+        if (metadata != null)
+            playlistManager.currentEpisodeFinished(metadata.getDescription().getMediaId());
     }
 }

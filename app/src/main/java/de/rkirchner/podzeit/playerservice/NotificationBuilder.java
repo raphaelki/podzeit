@@ -14,7 +14,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.app.NotificationCompat.MediaStyle;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.MediaSessionCompat.Token;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
@@ -25,12 +25,12 @@ public class NotificationBuilder {
     private final String NOW_PLAYING_CHANNEL = "de.kirchner.podzeit.NOW_PLAYING";
     private final String LOG_TAG = getClass().getSimpleName();
     private Context context;
-    private MediaSessionCompat mediaSession;
+    private Token mediaSessionToken;
     private NotificationManager notificationManager;
 
-    public NotificationBuilder(Context context, MediaSessionCompat mediaSession) {
+    public NotificationBuilder(Context context, Token mediaSessionToken) {
         this.context = context;
-        this.mediaSession = mediaSession;
+        this.mediaSessionToken = mediaSessionToken;
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
@@ -40,7 +40,7 @@ public class NotificationBuilder {
 
         MediaControllerCompat mediaController = null;
         try {
-            mediaController = new MediaControllerCompat(context, mediaSession.getSessionToken());
+            mediaController = new MediaControllerCompat(context, mediaSessionToken);
         } catch (RemoteException e) {
             Log.e(LOG_TAG, "Could not create media controller, thus can not create notification: " + e.getMessage());
             return null;
@@ -75,7 +75,7 @@ public class NotificationBuilder {
                 PlaybackStateCompat.ACTION_STOP);
 
         MediaStyle mediaStyle = new MediaStyle()
-                .setMediaSession(mediaSession.getSessionToken())
+                .setMediaSession(mediaSessionToken)
                 .setShowCancelButton(true)
                 .setCancelButtonIntent(stopIntent);
 

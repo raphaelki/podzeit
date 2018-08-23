@@ -5,14 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.AudioAttributesCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaBrowserServiceCompat;
-import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -20,6 +18,8 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
+import com.google.android.exoplayer2.ext.mediasession.TimelineQueueEditor;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
@@ -33,18 +33,12 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     private static final String MEDIA_ROOT_ID = "media_root_id";
     private static final String EMPTY_MEDIA_ROOT_ID = "empty_root_id";
     private final String LOG_TAG = getClass().getSimpleName();
-    private final int NOW_PLAYING_NOTIFICATION_ID = 5345345;
 
     private MediaSessionCompat mediaSession;
-    private PlaybackStateCompat.Builder stateBuilder;
     private MediaSessionConnector mediaSessionConnector;
     private SimpleExoPlayer player;
     private AudioAttributesCompat audioAttributes;
     private MediaControllerCompat controller;
-    private NotificationManagerCompat notificationManager;
-    private NotificationBuilder notificationBuilder;
-
-    private boolean isForeground = false;
 
     @Nullable
     @Override
@@ -87,7 +81,6 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
             // and put the children of that menu in the mediaItems list...
         }
         result.sendResult(mediaItems);
-
     }
 
     @Override
@@ -101,15 +94,20 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         mediaSession.setSessionActivity(sessionActivityPendingIntent);
         mediaSession.setActive(true);
 
-        notificationBuilder = new NotificationBuilder(this, mediaSession);
-        notificationManager = NotificationManagerCompat.from(this);
         controller = new MediaControllerCompat(this, mediaSession);
-        controller.registerCallback(new MediaControllerCallback());
+        controller.registerCallback(new MediaControllerCallback(this, mediaSession.getSessionToken()));
 
         mediaSessionConnector = new MediaSessionConnector(mediaSession);
-        mediaSessionConnector.setPlayer(player, new PlaybackPreparerImpl());
-        mediaSessionConnector.setQueueNavigator(new QueueNavigatorImpl(controller, this, player));
-        mediaSessionConnector.setQueueEditor(new QueueEditorImpl(mediaSession));
+        mediaSessionConnector.setPlayer(player, null);
+
+        List<MediaDescriptionCompat> queue = new ArrayList<>();
+        mediaSessionConnector.setQueueNavigator(new TimelineQueueNavigatorImpl(mediaSession, 10000, queue));
+        ConcatenatingMediaSource concatenatingMediaSource = new ConcatenatingMediaSource();
+        mediaSessionConnector.setQueueEditor(new TimelineQueueEditor(controller,
+                concatenatingMediaSource,
+                new QueueDataAdapterImpl(concatenatingMediaSource, queue),
+                new MediaSourceFactoryImpl(this)));
+        player.prepare(concatenatingMediaSource);
 
         audioAttributes = new AudioAttributesCompat.Builder()
                 .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
@@ -141,81 +139,6 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
         stopSelf();
-    }
-
-    private class MediaControllerCallback extends MediaControllerCompat.Callback {
-
-        @Override
-        public void onSessionReady() {
-            super.onSessionReady();
-        }
-
-        @Override
-        public void onSessionDestroyed() {
-            super.onSessionDestroyed();
-        }
-
-        @Override
-        public void onSessionEvent(String event, Bundle extras) {
-            super.onSessionEvent(event, extras);
-        }
-
-        @Override
-        public void onMetadataChanged(MediaMetadataCompat metadata) {
-            super.onMetadataChanged(metadata);
-        }
-
-        @Override
-        public void onQueueChanged(List<MediaSessionCompat.QueueItem> queue) {
-            super.onQueueChanged(queue);
-        }
-
-        @Override
-        public void onQueueTitleChanged(CharSequence title) {
-            super.onQueueTitleChanged(title);
-        }
-
-        @Override
-        public void onExtrasChanged(Bundle extras) {
-            super.onExtrasChanged(extras);
-        }
-
-        @Override
-        public void onAudioInfoChanged(MediaControllerCompat.PlaybackInfo info) {
-            super.onAudioInfoChanged(info);
-        }
-
-        @Override
-        public void onCaptioningEnabledChanged(boolean enabled) {
-            super.onCaptioningEnabledChanged(enabled);
-        }
-
-        @Override
-        public void onRepeatModeChanged(int repeatMode) {
-            super.onRepeatModeChanged(repeatMode);
-        }
-
-        @Override
-        public void onShuffleModeChanged(int shuffleMode) {
-            super.onShuffleModeChanged(shuffleMode);
-        }
-
-        @Override
-        public void binderDied() {
-            super.binderDied();
-        }
-
-        @Override
-        public void onPlaybackStateChanged(PlaybackStateCompat state) {
-            if (state.getState() == PlaybackStateCompat.STATE_PLAYING) {
-                startForeground(NOW_PLAYING_NOTIFICATION_ID, notificationBuilder.build());
-                isForeground = true;
-            } else if (state.getState() == PlaybackStateCompat.STATE_PAUSED) {
-                stopForeground(false);
-                notificationManager.notify(NOW_PLAYING_NOTIFICATION_ID, notificationBuilder.build());
-            }
-
-        }
     }
 }
 

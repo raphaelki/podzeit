@@ -35,6 +35,12 @@ public interface EpisodeDao {
             "WHERE id= :episodeId")
     MetadataJoin getEpisodeSync(int episodeId);
 
+    @Query(value = "SELECT * FROM podcast_episodes WHERE url = :url")
+    Episode getEpisodeForUrl(String url);
+
+    @Query(value = "SELECT * FROM podcast_episodes WHERE id = :episodeId")
+    Episode getEpisodeForId(int episodeId);
+
     @Update
     void updateEpisode(Episode episode);
 
