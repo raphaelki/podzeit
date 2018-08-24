@@ -36,6 +36,7 @@ public class PlaylistManager {
     private MediaSessionClient mediaSessionClient;
     private List<QueueItem> queue;
     private Context context;
+    private boolean skipToLastAddedItem = false;
 
     @Inject
     public PlaylistManager(PlaylistDao playlistDao, EpisodeDao episodeDao, AppExecutors appExecutors, MediaSessionClient mediaSessionClient, Context context) {
@@ -46,6 +47,11 @@ public class PlaylistManager {
         this.mediaSessionClient = mediaSessionClient;
         this.mediaSessionClient.getQueueItems().observeForever(queueItems -> {
             queue = queueItems;
+            if (skipToLastAddedItem) {
+                mediaSessionClient.getTransportControls().skipToQueueItem(queue.size() - 1);
+                mediaSessionClient.getTransportControls().play();
+                skipToLastAddedItem = false;
+            }
         });
         this.mediaSessionClient.getIsServiceConnected().observeForever(isServiceConnected -> {
             if (isServiceConnected != null && isServiceConnected) {
@@ -67,8 +73,7 @@ public class PlaylistManager {
     public void playNow(int episodeId) {
         appExecutors.diskIO().execute(() -> {
             int playlistPosition = addEpisodeToPlaylistInternal(episodeId);
-            mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
-            mediaSessionClient.getTransportControls().play();
+            skipToLastAddedItem = true;
         });
     }
 

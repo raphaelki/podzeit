@@ -72,7 +72,7 @@ public class NotificationBuilder {
         builder.addAction(nextAction);
 
         PendingIntent stopIntent = MediaButtonReceiver.buildMediaButtonPendingIntent(context,
-                PlaybackStateCompat.ACTION_STOP);
+                PlaybackStateCompat.ACTION_PAUSE);
 
         MediaStyle mediaStyle = new MediaStyle()
                 .setMediaSession(mediaSessionToken)

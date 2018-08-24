@@ -1,6 +1,7 @@
 package de.rkirchner.podzeit.playerservice;
 
 import android.support.v4.media.MediaDescriptionCompat;
+import android.support.v4.media.session.MediaControllerCompat;
 
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueEditor;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
@@ -12,9 +13,11 @@ public class QueueDataAdapterImpl implements TimelineQueueEditor.QueueDataAdapte
 
     private ConcatenatingMediaSource concatenatingMediaSource;
     private List<MediaDescriptionCompat> queue;
+    private MediaControllerCompat mediaControllerCompat;
 
-    public QueueDataAdapterImpl(ConcatenatingMediaSource concatenatingMediaSource, List<MediaDescriptionCompat> queue) {
+    public QueueDataAdapterImpl(ConcatenatingMediaSource concatenatingMediaSource, List<MediaDescriptionCompat> queue, MediaControllerCompat mediaControllerCompat) {
         this.concatenatingMediaSource = concatenatingMediaSource;
+        this.mediaControllerCompat = mediaControllerCompat;
         this.queue = queue;
     }
 
@@ -30,6 +33,7 @@ public class QueueDataAdapterImpl implements TimelineQueueEditor.QueueDataAdapte
 
     @Override
     public void remove(int position) {
+        mediaControllerCompat.getTransportControls().skipToQueueItem(position - 1);
         queue.remove(position);
     }
 

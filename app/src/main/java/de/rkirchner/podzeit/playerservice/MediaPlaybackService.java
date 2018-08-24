@@ -43,44 +43,15 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     @Nullable
     @Override
     public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
-//        // (Optional) Control the level of access for the specified package name.
-//        // You'll need to write your own logic to do this.
-        if (allowBrowsing(clientPackageName, clientUid)) {
-//            // Returns a root ID that clients can use with onLoadChildren() to retrieve
-//            // the content hierarchy.
-            return new BrowserRoot(MEDIA_ROOT_ID, null);
-        } else {
-//            // Clients can connect, but this BrowserRoot is an empty hierachy
-//            // so onLoadChildren returns nothing. This disables the ability to browse for content.
-            return new BrowserRoot(EMPTY_MEDIA_ROOT_ID, null);
-        }
-    }
-
-    private boolean allowBrowsing(String clientPackageName, int clientUid) {
-        return true;
+        return new BrowserRoot(EMPTY_MEDIA_ROOT_ID, null);
     }
 
     @Override
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
-        //  Browsing not allowed
         if (TextUtils.equals(EMPTY_MEDIA_ROOT_ID, parentId)) {
             result.sendResult(null);
             return;
         }
-
-        // Assume for example that the music catalog is already loaded/cached.
-
-        List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
-
-        // Check if this is the root menu:
-        if (MEDIA_ROOT_ID.equals(parentId)) {
-            // Build the MediaItem objects for the top level,
-            // and put them in the mediaItems list...
-        } else {
-            // Examine the passed parentMediaId to see which submenu we're at,
-            // and put the children of that menu in the mediaItems list...
-        }
-        result.sendResult(mediaItems);
     }
 
     @Override
@@ -101,11 +72,12 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         mediaSessionConnector.setPlayer(player, null);
 
         List<MediaDescriptionCompat> queue = new ArrayList<>();
-        mediaSessionConnector.setQueueNavigator(new TimelineQueueNavigatorImpl(mediaSession, 10000, queue));
+        TimelineQueueNavigatorImpl timelineQueueNavigator = new TimelineQueueNavigatorImpl(mediaSession, 10000, queue);
+        mediaSessionConnector.setQueueNavigator(timelineQueueNavigator);
         ConcatenatingMediaSource concatenatingMediaSource = new ConcatenatingMediaSource();
         mediaSessionConnector.setQueueEditor(new TimelineQueueEditor(controller,
                 concatenatingMediaSource,
-                new QueueDataAdapterImpl(concatenatingMediaSource, queue),
+                new QueueDataAdapterImpl(concatenatingMediaSource, queue, controller),
                 new MediaSourceFactoryImpl(this)));
         player.prepare(concatenatingMediaSource);
 
