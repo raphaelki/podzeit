@@ -11,7 +11,7 @@ import de.rkirchner.podzeit.data.models.Series;
         Series.class,
         Episode.class,
         PlaylistEntry.class
-}, version = 4)
+}, version = 6)
 public abstract class PodcastDatabase extends RoomDatabase {
 
     public static final String DATABASE_NAME = "podzeit.db";

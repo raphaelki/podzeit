@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:background="#fff"
+    android:padding="@dimen/widget_margin">
+
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/widget_button_layout"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
+        android:layout_toEndOf="@id/widget_thumbnail"
+        android:contentDescription="@string/appwidget_text"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:lines="2"
+        android:text="No episode loaded"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/widget_thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_placeholder" />
+
+    <LinearLayout
+        android:id="@+id/widget_button_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/widget_thumbnail"
+        android:gravity="center_horizontal">
+
+        <ImageButton
+            android:id="@+id/widget_previous"
+            style="@style/ExoMediaButton.Previous"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:scaleType="fitCenter"
+            android:tint="#99000000" />
+
+        <ImageButton
+            android:id="@+id/widget_play"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="8dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:scaleType="fitCenter"
+            android:src="@drawable/exo_controls_play"
+            android:tint="#99000000" />
+
+        <ImageButton
+            android:id="@+id/widget_next"
+            style="@style/ExoMediaButton.Next"
+            android:layout_width="60dp"
+            android:layout_height="40dp"
+            android:scaleType="fitCenter"
+            android:tint="#99000000" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

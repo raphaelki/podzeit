@@ -42,6 +42,16 @@
             android:name=".data.remote.FetchService"
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <receiver android:name=".widget.PlayerAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/player_app_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

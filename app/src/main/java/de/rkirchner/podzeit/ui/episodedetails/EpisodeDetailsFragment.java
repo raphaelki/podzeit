@@ -15,9 +15,9 @@ import javax.inject.Inject;
 import dagger.android.support.DaggerFragment;
 import de.rkirchner.podzeit.Constants;
 import de.rkirchner.podzeit.R;
+import de.rkirchner.podzeit.data.models.EpisodesPlaylistJoin;
 import de.rkirchner.podzeit.databinding.FragmentEpisodeDetailsBinding;
 import de.rkirchner.podzeit.ui.common.FormatterUtil;
-import de.rkirchner.podzeit.ui.episodelist.EpisodesPlaylistJoin;
 
 public class EpisodeDetailsFragment extends DaggerFragment {
 

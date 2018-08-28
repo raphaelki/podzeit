@@ -8,8 +8,8 @@ import android.arch.lifecycle.ViewModel;
 import javax.inject.Inject;
 
 import de.rkirchner.podzeit.data.local.EpisodeDao;
+import de.rkirchner.podzeit.data.models.EpisodesPlaylistJoin;
 import de.rkirchner.podzeit.playerclient.PlaylistManager;
-import de.rkirchner.podzeit.ui.episodelist.EpisodesPlaylistJoin;
 
 public class EpisodeDetailsViewModel extends ViewModel {
 

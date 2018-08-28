@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 import de.rkirchner.podzeit.data.DataState;
 import de.rkirchner.podzeit.data.PodcastRepository;
+import de.rkirchner.podzeit.data.models.EpisodesPlaylistJoin;
 import de.rkirchner.podzeit.data.models.Series;
 import de.rkirchner.podzeit.playerclient.PlaylistManager;
 

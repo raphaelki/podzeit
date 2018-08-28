@@ -17,6 +17,7 @@ import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
 import de.rkirchner.podzeit.R;
+import de.rkirchner.podzeit.data.models.EpisodePlaylistEntryJoin;
 import de.rkirchner.podzeit.databinding.FragmentPlaylistBinding;
 import de.rkirchner.podzeit.ui.common.NavigationController;
 
@@ -43,6 +44,12 @@ public class PlaylistFragment extends DaggerFragment {
 
     public PlaylistFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        adapter.setHasStableIds(true);
     }
 
     @Override

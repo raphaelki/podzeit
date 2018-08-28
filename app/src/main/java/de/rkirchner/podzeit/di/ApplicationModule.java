@@ -8,7 +8,9 @@ import javax.inject.Singleton;
 import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
+import dagger.android.ContributesAndroidInjector;
 import de.rkirchner.podzeit.PodZeit;
+import de.rkirchner.podzeit.widget.PlayerAppWidget;
 import retrofit2.Retrofit;
 
 @Module(includes = {
@@ -30,4 +32,7 @@ public abstract class ApplicationModule {
     @Singleton
     @Binds
     abstract Context bindContext(Application application);
+
+    @ContributesAndroidInjector
+    abstract PlayerAppWidget playerAppWidget();
 }

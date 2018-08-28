@@ -1,4 +1,4 @@
-package de.rkirchner.podzeit.ui.playlist;
+package de.rkirchner.podzeit.data.models;
 
 import java.util.Objects;
 
@@ -9,6 +9,15 @@ public class EpisodePlaylistEntryJoin {
     private int playlistPosition;
     private String duration;
     private String url;
+    private boolean isSelected;
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
 
     public String getUrl() {
         return url;
@@ -57,6 +66,7 @@ public class EpisodePlaylistEntryJoin {
         if (obj.getClass() != getClass()) return false;
         EpisodePlaylistEntryJoin object = (EpisodePlaylistEntryJoin) obj;
         return Objects.equals(id, object.id)
+                && Objects.equals(isSelected, object.isSelected)
                 && Objects.equals(title, object.title)
                 && Objects.equals(duration, object.duration);
     }

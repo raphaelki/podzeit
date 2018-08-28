@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import javax.inject.Inject;
 
 import de.rkirchner.podzeit.R;
+import de.rkirchner.podzeit.data.models.EpisodesPlaylistJoin;
 import de.rkirchner.podzeit.databinding.EpisodeListItemBinding;
 import de.rkirchner.podzeit.ui.common.BindingViewHolder;
 import de.rkirchner.podzeit.ui.common.FormatterUtil;

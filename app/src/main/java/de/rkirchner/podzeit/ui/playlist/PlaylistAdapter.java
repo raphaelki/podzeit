@@ -10,6 +10,7 @@ import java.util.Collections;
 import javax.inject.Inject;
 
 import de.rkirchner.podzeit.R;
+import de.rkirchner.podzeit.data.models.EpisodePlaylistEntryJoin;
 import de.rkirchner.podzeit.databinding.PlaylistItemBinding;
 import de.rkirchner.podzeit.playerclient.PlaylistManager;
 import de.rkirchner.podzeit.ui.common.BindingViewHolder;
@@ -85,5 +86,10 @@ public class PlaylistAdapter extends RecyclerViewListAdapter<PlaylistItemBinding
 
     public void registerPlaybackCallback(PlaybackCallback playbackCallback) {
         this.playbackCallback = playbackCallback;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getList().get(position).getId();
     }
 }

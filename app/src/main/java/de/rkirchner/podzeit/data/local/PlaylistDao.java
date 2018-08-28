@@ -10,8 +10,8 @@ import android.arch.persistence.room.Update;
 
 import java.util.List;
 
+import de.rkirchner.podzeit.data.models.EpisodePlaylistEntryJoin;
 import de.rkirchner.podzeit.data.models.PlaylistEntry;
-import de.rkirchner.podzeit.ui.playlist.EpisodePlaylistEntryJoin;
 
 @Dao
 public interface PlaylistDao {
@@ -19,8 +19,11 @@ public interface PlaylistDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     void insertEntry(PlaylistEntry playlistEntry);
 
-    @Query(value = "SELECT id, title, playlistPosition, duration, url FROM podcast_episodes INNER JOIN playlist ON playlist.episodeId = id ORDER BY playlistPosition ASC")
+    @Query(value = "SELECT id, isSelected, title, playlistPosition, duration, url FROM podcast_episodes INNER JOIN playlist ON playlist.episodeId = id ORDER BY playlistPosition ASC")
     LiveData<List<EpisodePlaylistEntryJoin>> getEpisodesInPlaylist();
+
+    @Query(value = "SELECT id, isSelected, title, playlistPosition, duration, url FROM podcast_episodes INNER JOIN playlist ON playlist.episodeId = id WHERE isSelected = 1")
+    EpisodePlaylistEntryJoin getSelectedEpisodeSync();
 
     @Query(value = "SELECT * FROM playlist WHERE episodeId = :episodeId")
     PlaylistEntry getPlaylistEntry(int episodeId);
@@ -42,6 +45,9 @@ public interface PlaylistDao {
 
     @Update
     void updateEntries(List<PlaylistEntry> entries);
+
+    @Update
+    void updateEntry(PlaylistEntry entry);
 
     @Delete
     void removeEpisodeFromPlaylist(PlaylistEntry playlistEntry);

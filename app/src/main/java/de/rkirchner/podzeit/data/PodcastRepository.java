@@ -22,11 +22,13 @@ import javax.inject.Inject;
 import de.rkirchner.podzeit.AppExecutors;
 import de.rkirchner.podzeit.Constants;
 import de.rkirchner.podzeit.data.local.EpisodeDao;
+import de.rkirchner.podzeit.data.local.PlaylistDao;
 import de.rkirchner.podzeit.data.local.SeriesDao;
 import de.rkirchner.podzeit.data.models.Episode;
+import de.rkirchner.podzeit.data.models.EpisodesPlaylistJoin;
+import de.rkirchner.podzeit.data.models.MetadataJoin;
 import de.rkirchner.podzeit.data.models.Series;
 import de.rkirchner.podzeit.data.remote.FetchService;
-import de.rkirchner.podzeit.ui.episodelist.EpisodesPlaylistJoin;
 import timber.log.Timber;
 
 public class PodcastRepository {
@@ -36,17 +38,19 @@ public class PodcastRepository {
     private DatabaseReference firebaseReference;
     private SeriesDao seriesDao;
     private EpisodeDao episodeDao;
+    private PlaylistDao playlistDao;
     private AppExecutors appExecutors;
     private Context context;
     private MutableLiveData<DataState> refreshDataState = new MutableLiveData<>();
     private FetchingStateReceiver fetchingStateReceiver;
 
     @Inject
-    public PodcastRepository(DatabaseReference firebaseReference, SeriesDao seriesDao, EpisodeDao episodeDao, AppExecutors appExecutors, Context context) {
+    public PodcastRepository(DatabaseReference firebaseReference, SeriesDao seriesDao, EpisodeDao episodeDao, AppExecutors appExecutors, Context context, PlaylistDao playlistDao) {
         this.firebaseReference = firebaseReference;
         this.seriesDao = seriesDao;
         this.episodeDao = episodeDao;
         this.appExecutors = appExecutors;
+        this.playlistDao = playlistDao;
         this.context = context;
         fetchingStateReceiver = new FetchingStateReceiver();
         IntentFilter fetchServiceIntentFilter = new IntentFilter(Constants.FETCH_SERVICE_BROADCAST_ACTION);
@@ -147,6 +151,10 @@ public class PodcastRepository {
                 FetchService.enqueueWork(context, intent);
             }
         });
+    }
+
+    public MetadataJoin getCurrentlySelectedEpisodeSync() {
+        return episodeDao.getCurrentlySelectedEpisodeSync();
     }
 
     public LiveData<DataState> getRefreshDataState() {

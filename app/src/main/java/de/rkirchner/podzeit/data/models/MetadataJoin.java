@@ -1,4 +1,4 @@
-package de.rkirchner.podzeit.playerclient;
+package de.rkirchner.podzeit.data.models;
 
 public class MetadataJoin {
 

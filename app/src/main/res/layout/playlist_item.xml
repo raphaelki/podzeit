@@ -6,7 +6,7 @@
 
         <variable
             name="episode"
-            type="de.rkirchner.podzeit.ui.playlist.EpisodePlaylistEntryJoin" />
+            type="de.rkirchner.podzeit.data.models.EpisodePlaylistEntryJoin" />
 
         <variable
             name="formatter"
@@ -18,7 +18,7 @@
         android:id="@+id/playlist_item_parent"
         android:layout_height="60dp"
         android:layout_marginBottom="1dp"
-        android:background="@color/playlist_background"
+        android:background="@{episode.isSelected ? @color/playlist_selected_color : @color/playlist_background}"
         android:foreground="?selectableItemBackground">
 
         <android.support.constraint.Guideline

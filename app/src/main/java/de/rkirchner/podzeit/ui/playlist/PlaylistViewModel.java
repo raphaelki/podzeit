@@ -13,6 +13,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import de.rkirchner.podzeit.data.local.PlaylistDao;
+import de.rkirchner.podzeit.data.models.EpisodePlaylistEntryJoin;
 import de.rkirchner.podzeit.playerclient.MediaSessionClient;
 import de.rkirchner.podzeit.playerclient.PlaylistManager;
 

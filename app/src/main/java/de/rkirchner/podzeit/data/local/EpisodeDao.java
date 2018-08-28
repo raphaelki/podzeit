@@ -10,8 +10,8 @@ import android.arch.persistence.room.Update;
 import java.util.List;
 
 import de.rkirchner.podzeit.data.models.Episode;
-import de.rkirchner.podzeit.playerclient.MetadataJoin;
-import de.rkirchner.podzeit.ui.episodelist.EpisodesPlaylistJoin;
+import de.rkirchner.podzeit.data.models.EpisodesPlaylistJoin;
+import de.rkirchner.podzeit.data.models.MetadataJoin;
 
 @Dao
 public interface EpisodeDao {
@@ -34,6 +34,13 @@ public interface EpisodeDao {
             "LEFT JOIN podcast_series ON podcast_series.rss_url = series_rss_url " +
             "WHERE id= :episodeId")
     MetadataJoin getEpisodeSync(int episodeId);
+
+    @Query(value = "SELECT id, podcast_episodes.title AS episodeTitle, podcast_episodes.summary, thumbnailUrl, url, podcast_series.title AS seriesTitle " +
+            "FROM podcast_episodes " +
+            "LEFT JOIN podcast_series ON podcast_series.rss_url = series_rss_url " +
+            "LEFT JOIN playlist ON playlist.episodeId = podcast_episodes.id " +
+            "WHERE playlist.isSelected = 1")
+    MetadataJoin getCurrentlySelectedEpisodeSync();
 
     @Query(value = "SELECT * FROM podcast_episodes WHERE url = :url")
     Episode getEpisodeForUrl(String url);

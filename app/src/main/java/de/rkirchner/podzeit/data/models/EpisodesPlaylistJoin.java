@@ -1,4 +1,4 @@
-package de.rkirchner.podzeit.ui.episodelist;
+package de.rkirchner.podzeit.data.models;
 
 import java.util.Objects;
 

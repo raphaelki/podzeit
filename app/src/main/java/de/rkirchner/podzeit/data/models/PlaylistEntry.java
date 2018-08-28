@@ -9,10 +9,20 @@ public class PlaylistEntry {
     @PrimaryKey
     private int episodeId;
     private int playlistPosition;
+    private boolean isSelected;
 
-    public PlaylistEntry(int episodeId, int playlistPosition) {
+    public PlaylistEntry(int episodeId, int playlistPosition, boolean isSelected) {
         this.episodeId = episodeId;
         this.playlistPosition = playlistPosition;
+        this.isSelected = isSelected;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 
     public int getEpisodeId() {

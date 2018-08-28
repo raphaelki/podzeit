@@ -13,4 +13,6 @@
     <string name="channel_description">Notifications for content update</string>
     <string name="now_playing_channel_name">Now playing</string>
     <string name="now_playing_channel_description">Shows currently playing episode</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>

@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import de.rkirchner.podzeit.playerservice.MediaPlaybackService;
+import de.rkirchner.podzeit.widget.WidgetHelper;
 import timber.log.Timber;
 
 @Singleton
@@ -34,6 +35,7 @@ public class MediaSessionClient {
     private MediaControllerCompat.TransportControls transportControls;
     private MutableLiveData<List<MediaSessionCompat.QueueItem>> queueItems = new MutableLiveData<>();
     private MutableLiveData<MediaMetadataCompat> mediaMetadata = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isPlaying = new MutableLiveData<>();
 
     @Inject
     public MediaSessionClient(Context context) {
@@ -55,16 +57,20 @@ public class MediaSessionClient {
         mediaBrowser = new MediaBrowserCompat(context, componentName, connectionCallbacks, null);
     }
 
-    public MutableLiveData<Boolean> getIsServiceConnected() {
+    public LiveData<Boolean> getIsServiceConnected() {
         return isServiceConnected;
     }
 
-    public MutableLiveData<PlaybackStateCompat> getPlaybackState() {
+    public LiveData<PlaybackStateCompat> getPlaybackState() {
         return playbackState;
     }
 
     public MediaControllerCompat.TransportControls getTransportControls() {
         return transportControls;
+    }
+
+    public LiveData<Boolean> getIsPlaying() {
+        return isPlaying;
     }
 
     public MediaControllerCompat getMediaController() {
@@ -154,6 +160,12 @@ public class MediaSessionClient {
         @Override
         public void onPlaybackStateChanged(PlaybackStateCompat state) {
             playbackState.postValue(state);
+            if (state.getState() == PlaybackStateCompat.STATE_PLAYING) {
+                isPlaying.postValue(true);
+            } else {
+                isPlaying.postValue(false);
+            }
+            WidgetHelper.triggerWidgetUpdate(context);
             Timber.d("Playback state changed: %s", state.getState());
         }
 
