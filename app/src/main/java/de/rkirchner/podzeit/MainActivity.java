@@ -1,5 +1,6 @@
 package de.rkirchner.podzeit;
 
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -74,5 +75,13 @@ public class MainActivity extends DaggerAppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent.hasExtra(Constants.EPISODE_ID_KEY)) {
+            navigationController.onEpisodeSelected(intent.getIntExtra(Constants.EPISODE_ID_KEY, 0));
+        }
     }
 }

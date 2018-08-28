@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,6 +24,8 @@ import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasBroadcastReceiverInjector;
 import de.rkirchner.podzeit.AppExecutors;
+import de.rkirchner.podzeit.Constants;
+import de.rkirchner.podzeit.MainActivity;
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.data.PodcastRepository;
 import de.rkirchner.podzeit.data.models.MetadataJoin;
@@ -62,9 +65,14 @@ public class PlayerAppWidget extends AppWidgetProvider implements HasBroadcastRe
                             .load(currentEpisode.getThumbnailUrl())
                             .into(appWidgetTarget);
                 });
+
+                // setup intent to show episode details
+                Intent intent = new Intent(context, MainActivity.class);
+                intent.putExtra(Constants.EPISODE_ID_KEY, currentEpisode.getId());
+                PendingIntent showEpisodeDetailsPendingIntent = PendingIntent.getActivity(context, 345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                views.setOnClickPendingIntent(R.id.widget_thumbnail, showEpisodeDetailsPendingIntent);
             }
             boolean isPlaying = false;
-
             try {
                 isPlaying = mediaSessionClient.getMediaController().getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING;
             } catch (NullPointerException e) {
@@ -72,6 +80,7 @@ public class PlayerAppWidget extends AppWidgetProvider implements HasBroadcastRe
             }
             Timber.d("Player state changed: %s", isPlaying);
             views.setImageViewResource(R.id.widget_play, isPlaying ? R.drawable.exo_controls_pause : R.drawable.exo_controls_play);
+
             PendingIntent playIntent =
                     MediaButtonReceiver.buildMediaButtonPendingIntent(context,
                             isPlaying ? PlaybackStateCompat.ACTION_PAUSE : PlaybackStateCompat.ACTION_PLAY);
