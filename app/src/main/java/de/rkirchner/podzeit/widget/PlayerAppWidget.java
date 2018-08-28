@@ -49,6 +49,7 @@ public class PlayerAppWidget extends AppWidgetProvider implements HasBroadcastRe
     private void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                  int appWidgetId) {
         appExecutors.diskIO().execute(() -> {
+            Intent intent = new Intent(context, MainActivity.class);
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.player_app_widget);
             MetadataJoin currentEpisode = repository.getCurrentlySelectedEpisodeSync();
             if (currentEpisode != null) {
@@ -67,10 +68,7 @@ public class PlayerAppWidget extends AppWidgetProvider implements HasBroadcastRe
                 });
 
                 // setup intent to show episode details
-                Intent intent = new Intent(context, MainActivity.class);
                 intent.putExtra(Constants.EPISODE_ID_KEY, currentEpisode.getId());
-                PendingIntent showEpisodeDetailsPendingIntent = PendingIntent.getActivity(context, 345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                views.setOnClickPendingIntent(R.id.widget_thumbnail, showEpisodeDetailsPendingIntent);
             }
             boolean isPlaying = false;
             try {
@@ -81,6 +79,8 @@ public class PlayerAppWidget extends AppWidgetProvider implements HasBroadcastRe
             Timber.d("Player state changed: %s", isPlaying);
             views.setImageViewResource(R.id.widget_play, isPlaying ? R.drawable.exo_controls_pause : R.drawable.exo_controls_play);
 
+            PendingIntent showEpisodeDetailsPendingIntent = PendingIntent.getActivity(context, 345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setOnClickPendingIntent(R.id.widget_thumbnail, showEpisodeDetailsPendingIntent);
             PendingIntent playIntent =
                     MediaButtonReceiver.buildMediaButtonPendingIntent(context,
                             isPlaying ? PlaybackStateCompat.ACTION_PAUSE : PlaybackStateCompat.ACTION_PLAY);
