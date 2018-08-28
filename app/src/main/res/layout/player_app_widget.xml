@@ -42,7 +42,8 @@
 
         <ImageButton
             android:id="@+id/widget_previous"
-            style="@style/ExoMediaButton.Previous"
+            style="@style/WidgetMediaButtons"
+            android:src="@drawable/exo_controls_previous"
             android:layout_width="60dp"
             android:layout_height="40dp"
             android:scaleType="fitCenter"
@@ -53,14 +54,15 @@
             android:layout_width="60dp"
             android:layout_height="40dp"
             android:layout_marginBottom="8dp"
-            android:background="?android:attr/selectableItemBackground"
+            style="@style/WidgetMediaButtons"
             android:scaleType="fitCenter"
             android:src="@drawable/exo_controls_play"
             android:tint="#99000000" />
 
         <ImageButton
             android:id="@+id/widget_next"
-            style="@style/ExoMediaButton.Next"
+            style="@style/WidgetMediaButtons"
+            android:src="@drawable/exo_controls_next"
             android:layout_width="60dp"
             android:layout_height="40dp"
             android:scaleType="fitCenter"
