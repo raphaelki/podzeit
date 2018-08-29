@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="series_grid_span_count">3</integer>
+    <dimen name="episode_list_app_bar_height">100dp</dimen>
+</resources>

@@ -7,12 +7,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:paddingBottom="16dp"
+        android:id="@+id/player_parent_layout"
+        android:paddingBottom="@dimen/player_margin_bottom"
         tools:context=".ui.player.PlayerFragment">
 
         <TextView
             android:layout_width="0dp"
-            android:paddingBottom="8dp"
+            android:paddingBottom="@dimen/player_title_margin_bottom"
             android:paddingEnd="8dp"
             android:id="@+id/player_title"
             android:paddingStart="8dp"
@@ -24,6 +25,7 @@
             app:layout_constraintEnd_toStartOf="@id/player_expand_arrow"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:text="No episode loaded"
             tools:text="Sollen abgelehnte Asylbewerber " />
 
         <View
@@ -97,7 +99,8 @@
 
         <ImageButton
             android:id="@+id/player_prev"
-            style="@style/ExoMediaButton.Previous"
+            style="@style/MediaButtons.Player"
+            android:src="@drawable/exo_controls_previous"
             android:tint="@color/player_control_tint"
             app:layout_constraintEnd_toStartOf="@+id/player_rew"
             app:layout_constraintStart_toStartOf="parent"
@@ -105,7 +108,8 @@
 
         <ImageButton
             android:id="@+id/player_rew"
-            style="@style/ExoMediaButton.Rewind"
+            style="@style/MediaButtons.Player"
+            android:src="@drawable/exo_controls_rewind"
             android:tint="@color/player_control_tint"
             app:layout_constraintEnd_toStartOf="@+id/player_play"
             app:layout_constraintStart_toEndOf="@+id/player_prev"
@@ -113,7 +117,8 @@
 
         <ImageButton
             android:id="@+id/player_play"
-            style="@style/ExoMediaButton.Play"
+            style="@style/MediaButtons.Player"
+            android:src="@drawable/exo_controls_play"
             android:tint="@color/player_control_tint"
             app:layout_constraintEnd_toStartOf="@+id/player_ffwd"
             app:layout_constraintStart_toEndOf="@+id/player_rew"
@@ -121,7 +126,8 @@
 
         <ImageButton
             android:id="@+id/player_ffwd"
-            style="@style/ExoMediaButton.FastForward"
+            style="@style/MediaButtons.Player"
+            android:src="@drawable/exo_controls_fastforward"
             android:tint="@color/player_control_tint"
             app:layout_constraintEnd_toStartOf="@+id/player_next"
             app:layout_constraintStart_toEndOf="@+id/player_play"
@@ -129,7 +135,8 @@
 
         <ImageButton
             android:id="@+id/player_next"
-            style="@style/ExoMediaButton.Next"
+            style="@style/MediaButtons.Player"
+            android:src="@drawable/exo_controls_next"
             android:tint="@color/player_control_tint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/player_ffwd"

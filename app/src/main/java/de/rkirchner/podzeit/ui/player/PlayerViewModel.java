@@ -2,7 +2,7 @@ package de.rkirchner.podzeit.ui.player;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -15,17 +15,51 @@ public class PlayerViewModel extends ViewModel {
 
     private MediaSessionClient mediaSessionClient;
     private MutableLiveData<Boolean> playbackState = new MutableLiveData<>();
-    private Observer<PlaybackStateCompat> playbackStateObserver = playbackStateCompat -> {
-        if (playbackStateCompat.getState() == PlaybackStateCompat.STATE_PLAYING) {
-            playbackState.postValue(true);
-        } else playbackState.postValue(false);
-    };
 
-    public LiveData<MediaMetadataCompat> getMetadata() {
+    @Inject
+    public PlayerViewModel(MediaSessionClient mediaSessionClient) {
+        this.mediaSessionClient = mediaSessionClient;
+        playbackState.postValue(false);
+    }
+
+    public LiveData<String> getCurrentMediaId() {
+        return Transformations.map(getMetadata(),
+                metadata -> metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID));
+    }
+
+    public LiveData<Boolean> isPlaying() {
+        return Transformations.map(getPlaybackState(),
+                state -> state.getState() == PlaybackStateCompat.STATE_PLAYING);
+    }
+
+    public LiveData<Long> getEpisodeDuration() {
+        return Transformations.map(getMetadata(),
+                metadata -> metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
+    }
+
+    public LiveData<String> getTitle() {
+        return Transformations.map(getMetadata(),
+                metadata -> metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE));
+    }
+
+    public LiveData<String> getSummary() {
+        return Transformations.map(getMetadata(),
+                metadata -> metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION));
+    }
+
+    public LiveData<Long> getPlayPosition() {
+        return Transformations.map(getPlaybackState(), PlaybackStateCompat::getPosition);
+    }
+
+    public LiveData<Float> getPlaybackSpeed() {
+        return Transformations.map(getPlaybackState(), PlaybackStateCompat::getPlaybackSpeed);
+    }
+
+    private LiveData<MediaMetadataCompat> getMetadata() {
         return mediaSessionClient.getMediaMetadata();
     }
 
-    public LiveData<PlaybackStateCompat> getPlaybackState() {
+    private LiveData<PlaybackStateCompat> getPlaybackState() {
         return mediaSessionClient.getPlaybackState();
     }
 
@@ -47,23 +81,6 @@ public class PlayerViewModel extends ViewModel {
 
     public void skipToPrevious() {
         mediaSessionClient.getTransportControls().skipToPrevious();
-    }
-
-    @Inject
-    public PlayerViewModel(MediaSessionClient mediaSessionClient) {
-        this.mediaSessionClient = mediaSessionClient;
-        playbackState.postValue(false);
-        mediaSessionClient.getPlaybackState().observeForever(playbackStateObserver);
-    }
-
-    public LiveData<Boolean> isPlaying() {
-        return playbackState;
-    }
-
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        mediaSessionClient.getPlaybackState().removeObserver(playbackStateObserver);
     }
 
     public void startPlayback() {

@@ -18,8 +18,13 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="WidgetMediaButtons">
+    <style name="MediaButtons">
         <item name="android:background">?android:attr/selectableItemBackground</item>
+    </style>
+
+    <style name="MediaButtons.Player">
+        <item name="android:layout_height">@dimen/player_button_height</item>
+        <item name="android:layout_width">@dimen/player_button_width</item>
     </style>
 
 </resources>

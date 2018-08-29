@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="android.support.v7.widget.GridLayoutManager"
-        app:spanCount="2"
+            app:spanCount="@integer/series_grid_span_count"
         tools:context=".ui.seriesgrid.SeriesGridFragment"
         tools:listitem="@layout/series_grid_item" />
     </android.support.v4.widget.SwipeRefreshLayout>

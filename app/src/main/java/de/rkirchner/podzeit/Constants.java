@@ -10,4 +10,5 @@ public class Constants {
     public static final String FETCH_SERVICE_EPISODES_FINISHED = "finished_fetching_episodes";
     public static final String CREDENTIALS_KEY = "credentials";
     public static final String URI_AUTHORITY_KEY = "uri_authority";
+    public static final String PLAYER_EXPANDED_STATE_KEY = "player_expanded_state";
 }

@@ -6,9 +6,8 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +19,7 @@ import com.google.android.exoplayer2.ui.TimeBar;
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
+import de.rkirchner.podzeit.Constants;
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.databinding.FragmentPlayerBinding;
 import de.rkirchner.podzeit.playerclient.PlaylistManager;
@@ -28,25 +28,26 @@ import timber.log.Timber;
 
 public class PlayerFragment extends DaggerFragment {
 
-    private FragmentPlayerBinding binding;
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-    private PlayerViewModel viewModel;
-    private boolean isPlaying = false;
     @Inject
     PlaylistManager playlistManager;
     @Inject
     FormatterUtil formatterUtil;
-    private boolean summaryExpanded;
+    private FragmentPlayerBinding binding;
+    private PlayerViewModel viewModel;
+
+    private boolean isSummaryExpanded;
+    private float playbackSpeed;
+    private long playbackPosition;
+    private long duration;
+    private ValueAnimator progressAnimator;
+    private boolean isPlaying;
+    private String mediaId;
 
     public PlayerFragment() {
         // Required empty public constructor
     }
-
-    private MediaMetadataCompat metadata;
-    private PlaybackStateCompat playbackState;
-    private long duration = 0;
-    private ValueAnimator progressAnimator;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,14 +57,7 @@ public class PlayerFragment extends DaggerFragment {
             if (isPlaying) viewModel.pausePlayback();
             else viewModel.startPlayback();
         });
-
         return binding.getRoot();
-    }
-
-    private void setDuration(long duration) {
-        if (duration >= 0) {
-            this.duration = duration;
-        }
     }
 
     @Override
@@ -74,6 +68,7 @@ public class PlayerFragment extends DaggerFragment {
             if (isPlaying != null) {
                 this.isPlaying = isPlaying;
                 binding.playerPlay.setImageResource(isPlaying ? R.drawable.exo_controls_pause : R.drawable.exo_controls_play);
+                updateMediaBarAnimation();
             }
         });
         binding.playerFfwd.setOnClickListener(v -> {
@@ -98,27 +93,27 @@ public class PlayerFragment extends DaggerFragment {
         binding.playerExpandArrow.setOnClickListener(v -> {
             animateScrollViewChange();
         });
-        viewModel.getMetadata().observe(this, metadata -> {
-            if (metadata != null) {
-                this.metadata = metadata;
-                setDuration(metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
-                binding.playerTitle.setText(metadata.getText(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE));
-                binding.playerTimeBar.setDuration(duration);
-                binding.playerSummary.setText(metadata.getText(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION));
+        viewModel.getCurrentMediaId().observe(this, mediaId -> {
+            if (mediaId != null) this.mediaId = mediaId;
+        });
+        viewModel.getTitle().observe(this, binding.playerTitle::setText);
+        viewModel.getSummary().observe(this, binding.playerSummary::setText);
+        viewModel.getEpisodeDuration().observe(this, duration -> {
+            if (duration != null) {
+                this.duration = duration;
+                updateMediaBarAnimation();
             }
         });
-        viewModel.getPlaybackState().observe(this, state -> {
-            playbackState = state;
-            if (state != null) {
-                long position = state.getPosition();
-                float playbackSpeed = state.getPlaybackSpeed();
-                if (progressAnimator != null) {
-                    progressAnimator.cancel();
-                    progressAnimator = null;
-                }
-                if (state.getState() == PlaybackStateCompat.STATE_PLAYING) {
-                    setupMediaBarAnimation(position, playbackSpeed);
-                }
+        viewModel.getPlaybackSpeed().observe(this, playbackSpeed -> {
+            if (playbackSpeed != null) {
+                this.playbackSpeed = playbackSpeed;
+                updateMediaBarAnimation();
+            }
+        });
+        viewModel.getPlayPosition().observe(this, position -> {
+            if (position != null) {
+                playbackPosition = position;
+                updateMediaBarAnimation();
             }
         });
 
@@ -139,13 +134,13 @@ public class PlayerFragment extends DaggerFragment {
     }
 
     private void setExpandIcon() {
-        binding.playerExpandArrow.setBackgroundResource(summaryExpanded ? R.drawable.ic_keyboard_arrow_down : R.drawable.ic_keyboard_arrow_up);
+        binding.playerExpandArrow.setBackgroundResource(isSummaryExpanded ? R.drawable.ic_keyboard_arrow_down : R.drawable.ic_keyboard_arrow_up);
     }
 
     private void animateScrollViewChange() {
         int startHeight = 1;
         int endHeight = 200;
-        if (summaryExpanded) {
+        if (isSummaryExpanded) {
             startHeight = 200;
             endHeight = 1;
         }
@@ -158,18 +153,34 @@ public class PlayerFragment extends DaggerFragment {
             binding.playerSummaryScrollView.setLayoutParams(layoutParams);
         });
         valueAnimator.start();
-        summaryExpanded = !summaryExpanded;
+        isSummaryExpanded = !isSummaryExpanded;
         setExpandIcon();
     }
 
-    private void setupMediaBarAnimation(long position, float playbackSpeed) {
-        final int timeToEnd = (int) ((duration - position) / playbackSpeed);
-        Timber.d("duration: %s, position: %s, playbackSpeed: %s", duration, position, playbackSpeed);
-        if (position > duration) {
+    private boolean mediaBarAnimationValuesAreValid() {
+        Timber.d("duration: %s, position: %s, playbackSpeed: %s", duration, playbackPosition, playbackSpeed);
+        return duration >= 0 && playbackPosition >= 0 && playbackSpeed > 0.0f;
+    }
+
+    private void updateMediaBarAnimation() {
+        if (progressAnimator != null) {
+            progressAnimator.cancel();
+            progressAnimator = null;
+        }
+        if (isPlaying) {
+            setupMediaBarAnimation();
+        }
+    }
+
+    private void setupMediaBarAnimation() {
+        if (!mediaBarAnimationValuesAreValid()) return;
+        final int timeToEnd = (int) ((duration - playbackPosition) / playbackSpeed);
+        if (playbackPosition > duration) {
             onEpisodeFinished();
             return;
         }
-        progressAnimator = ValueAnimator.ofInt((int) position, (int) duration).setDuration(timeToEnd);
+        binding.playerTimeBar.setDuration(duration);
+        progressAnimator = ValueAnimator.ofInt((int) playbackPosition, (int) duration).setDuration(timeToEnd);
         progressAnimator.setInterpolator(new LinearInterpolator());
         progressAnimator.addUpdateListener((ValueAnimator animation) -> {
             int timeElapsed = (int) animation.getAnimatedValue();
@@ -184,7 +195,30 @@ public class PlayerFragment extends DaggerFragment {
     }
 
     private void onEpisodeFinished() {
-        if (metadata != null)
-            playlistManager.currentEpisodeFinished(metadata.getDescription().getMediaId());
+        if (mediaId != null)
+            playlistManager.currentEpisodeFinished(mediaId);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(Constants.PLAYER_EXPANDED_STATE_KEY, isSummaryExpanded);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            restoreSummaryExpandedState(savedInstanceState.getBoolean(Constants.PLAYER_EXPANDED_STATE_KEY));
+        }
+    }
+
+    private void restoreSummaryExpandedState(boolean isSummaryExpanded) {
+        this.isSummaryExpanded = isSummaryExpanded;
+        if (isSummaryExpanded) {
+            ViewGroup.LayoutParams layoutParams = binding.playerSummaryScrollView.getLayoutParams();
+            layoutParams.height = 200;
+            binding.playerSummaryScrollView.setLayoutParams(layoutParams);
+        }
     }
 }

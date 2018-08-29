@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="player_margin_bottom">8dp</dimen>
+    <dimen name="player_button_height">40dp</dimen>
+    <dimen name="player_button_width">55dp</dimen>
+    <dimen name="player_title_margin_bottom">4dp</dimen>
+</resources>
