@@ -1,6 +1,7 @@
 package de.rkirchner.podzeit.ui.common;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.transition.Fade;
 import android.support.transition.Slide;
 import android.support.v4.app.Fragment;
@@ -10,11 +11,13 @@ import android.view.Gravity;
 
 import javax.inject.Inject;
 
-import de.rkirchner.podzeit.MainActivity;
+import de.rkirchner.podzeit.Constants;
 import de.rkirchner.podzeit.R;
+import de.rkirchner.podzeit.SettingsFragment;
 import de.rkirchner.podzeit.ui.episodedetails.EpisodeDetailsFragment;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListClickCallback;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListFragment;
+import de.rkirchner.podzeit.ui.logindialog.LoginActivity;
 import de.rkirchner.podzeit.ui.player.PlayerFragment;
 import de.rkirchner.podzeit.ui.player.PlayerVisibilityListener;
 import de.rkirchner.podzeit.ui.playlist.PlaylistFragment;
@@ -30,8 +33,8 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
     private FragmentManager fragmentManager;
 
     @Inject
-    public NavigationController(MainActivity activity, Context context) {
-        this.fragmentManager = activity.getSupportFragmentManager();
+    public NavigationController(FragmentManager fragmentManager, Context context) {
+        this.fragmentManager = fragmentManager;
         this.context = context;
     }
 
@@ -39,7 +42,9 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
         Fragment playerFragment = fragmentManager.findFragmentByTag(PLAYER_FRAGMENT_TAG);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (playerFragment == null) {
-            fragmentTransaction.add(PLAYER_FRAGMENT_FRAME_ID, new PlayerFragment(), PLAYER_FRAGMENT_TAG);
+            Fragment fragment = new PlayerFragment();
+            fragment.setEnterTransition(new Slide(Gravity.BOTTOM));
+            fragmentTransaction.add(PLAYER_FRAGMENT_FRAME_ID, fragment, PLAYER_FRAGMENT_TAG);
         } else {
             fragmentTransaction.show(playerFragment);
         }
@@ -66,32 +71,17 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
 
     public void navigateToSeriesGrid() {
         SeriesGridFragment fragment = new SeriesGridFragment();
-        setTransitions(fragment);
-        fragmentManager.beginTransaction()
-                .setReorderingAllowed(true)
-                .replace(UPPER_FRAGMENT_FRAME_ID, fragment)
-                .addToBackStack(null)
-                .commit();
+        setTransitionAndNavigateToFragment(fragment);
     }
 
     private void navigateToEpisodeList(String rssUrl) {
         Fragment fragment = EpisodeListFragment.create(rssUrl);
-        setTransitions(fragment);
-        fragmentManager.beginTransaction()
-                .setReorderingAllowed(true)
-                .replace(UPPER_FRAGMENT_FRAME_ID, fragment)
-                .addToBackStack(null)
-                .commit();
+        setTransitionAndNavigateToFragment(fragment);
     }
 
     private void navigateToEpisodeDetails(int episodeId) {
         Fragment fragment = EpisodeDetailsFragment.create(episodeId);
-        setTransitions(fragment);
-        fragmentManager.beginTransaction()
-                .setReorderingAllowed(true)
-                .replace(UPPER_FRAGMENT_FRAME_ID, fragment)
-                .addToBackStack(null)
-                .commit();
+        setTransitionAndNavigateToFragment(fragment);
     }
 
     @Override
@@ -113,5 +103,26 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
     private void setTransitions(Fragment fragment) {
         fragment.setExitTransition(new Fade());
         fragment.setEnterTransition(new Slide(Gravity.RIGHT));
+    }
+
+    public void navigateToSettings() {
+        SettingsFragment fragment = new SettingsFragment();
+        setTransitionAndNavigateToFragment(fragment);
+        hidePlayer();
+    }
+
+    private void setTransitionAndNavigateToFragment(Fragment fragment) {
+        setTransitions(fragment);
+        fragmentManager.beginTransaction()
+                .setReorderingAllowed(true)
+                .replace(UPPER_FRAGMENT_FRAME_ID, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void showLoginDialog(String uriAuthority) {
+        Intent intent = new Intent(context, LoginActivity.class);
+        intent.putExtra(Constants.URI_AUTHORITY_KEY, uriAuthority);
+        context.startActivity(intent);
     }
 }

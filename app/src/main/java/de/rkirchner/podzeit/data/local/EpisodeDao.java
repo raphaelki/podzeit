@@ -29,13 +29,13 @@ public interface EpisodeDao {
     LiveData<Episode> getEpisode(int episodeId);
 
     @Query(value = "SELECT id, podcast_episodes.title AS episodeTitle, podcast_episodes.summary," +
-            " thumbnailUrl, url, podcast_series.title AS seriesTitle " +
+            " thumbnailUrl, url, podcast_series.title AS seriesTitle, credentials " +
             "FROM podcast_episodes " +
             "LEFT JOIN podcast_series ON podcast_series.rss_url = series_rss_url " +
             "WHERE id= :episodeId")
     MetadataJoin getEpisodeSync(int episodeId);
 
-    @Query(value = "SELECT id, podcast_episodes.title AS episodeTitle, podcast_episodes.summary, thumbnailUrl, url, podcast_series.title AS seriesTitle " +
+    @Query(value = "SELECT id, podcast_episodes.title AS episodeTitle, podcast_episodes.summary, thumbnailUrl, url, podcast_series.title AS seriesTitle, credentials " +
             "FROM podcast_episodes " +
             "LEFT JOIN podcast_series ON podcast_series.rss_url = series_rss_url " +
             "LEFT JOIN playlist ON playlist.episodeId = podcast_episodes.id " +

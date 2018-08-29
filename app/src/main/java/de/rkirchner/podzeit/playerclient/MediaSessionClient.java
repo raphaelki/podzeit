@@ -36,9 +36,13 @@ public class MediaSessionClient {
     private MutableLiveData<List<MediaSessionCompat.QueueItem>> queueItems = new MutableLiveData<>();
     private MutableLiveData<MediaMetadataCompat> mediaMetadata = new MutableLiveData<>();
     private MutableLiveData<Boolean> isPlaying = new MutableLiveData<>();
+    private ErrorHandler errorHandler;
+    private PlaybackStateCompat tempPlaybackState;
+    private MediaMetadataCompat tempMediaMetadata;
 
     @Inject
-    public MediaSessionClient(Context context) {
+    public MediaSessionClient(Context context, ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
         this.context = context;
         isServiceConnected.postValue(false);
         playbackState.postValue(buildPlaybackStateCompat(PlaybackStateCompat.STATE_NONE));
@@ -159,14 +163,20 @@ public class MediaSessionClient {
 
         @Override
         public void onPlaybackStateChanged(PlaybackStateCompat state) {
+            if (tempPlaybackState == state) return;
             playbackState.postValue(state);
             if (state.getState() == PlaybackStateCompat.STATE_PLAYING) {
                 isPlaying.postValue(true);
             } else {
                 isPlaying.postValue(false);
             }
+            if (state.getState() == PlaybackStateCompat.STATE_ERROR) {
+                Timber.w("Player error: %s, %s", state.getErrorCode(), state.getErrorMessage());
+                errorHandler.handleError(state.getErrorCode(), state.getErrorMessage().toString());
+            }
             WidgetHelper.triggerWidgetUpdate(context);
             Timber.d("Playback state changed: %s", state.getState());
+            tempPlaybackState = state;
         }
 
         @Override
@@ -177,6 +187,7 @@ public class MediaSessionClient {
         @Override
         public void onMetadataChanged(MediaMetadataCompat metadata) {
             mediaMetadata.postValue(metadata);
+            tempMediaMetadata = metadata;
         }
 
         @Override

@@ -24,7 +24,7 @@ public class EpisodeDetailsViewModel extends ViewModel {
     }
 
     public void playEpisode() {
-        playlistManager.playNow(episodeId.getValue());
+        playlistManager.addEpisodeAndPlayNow(episodeId.getValue());
     }
 
     public LiveData<EpisodesPlaylistJoin> getEpisode() {

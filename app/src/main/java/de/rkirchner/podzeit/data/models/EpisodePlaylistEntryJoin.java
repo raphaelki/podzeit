@@ -10,6 +10,15 @@ public class EpisodePlaylistEntryJoin {
     private String duration;
     private String url;
     private boolean isSelected;
+    private String seriesTitle;
+
+    public String getSeriesTitle() {
+        return seriesTitle;
+    }
+
+    public void setSeriesTitle(String seriesTitle) {
+        this.seriesTitle = seriesTitle;
+    }
 
     public boolean isSelected() {
         return isSelected;

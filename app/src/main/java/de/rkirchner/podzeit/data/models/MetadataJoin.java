@@ -8,6 +8,15 @@ public class MetadataJoin {
     private String thumbnailUrl;
     private String url;
     private String seriesTitle;
+    private String credentials;
+
+    public String getCredentials() {
+        return credentials;
+    }
+
+    public void setCredentials(String credentials) {
+        this.credentials = credentials;
+    }
 
     public int getId() {
         return id;

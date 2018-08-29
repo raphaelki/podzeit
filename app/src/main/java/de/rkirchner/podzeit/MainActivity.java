@@ -70,6 +70,9 @@ public class MainActivity extends DaggerAppCompatActivity
             case R.id.nav_playlist:
                 navigationController.navigateToPlaylist();
                 break;
+            case R.id.nav_settings:
+                navigationController.navigateToSettings();
+                break;
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

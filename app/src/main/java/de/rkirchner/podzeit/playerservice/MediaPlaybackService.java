@@ -12,6 +12,7 @@ import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
+import android.util.Pair;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -24,6 +25,7 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.HttpDataSource.InvalidResponseCodeException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +82,17 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
                 new QueueDataAdapterImpl(concatenatingMediaSource, queue, controller),
                 new MediaSourceFactoryImpl(this)));
         player.prepare(concatenatingMediaSource);
+        mediaSessionConnector.setErrorMessageProvider(throwable -> {
+            int errorCode = 0;
+            String message = throwable.getSourceException().getMessage();
+            if (throwable.getSourceException() instanceof InvalidResponseCodeException) {
+                InvalidResponseCodeException exception = ((InvalidResponseCodeException) throwable.getSourceException());
+                errorCode = exception.responseCode;
+                message = exception.dataSpec.uri.getAuthority();
+            }
+            return new Pair<>(errorCode, message);
+        });
+
 
         audioAttributes = new AudioAttributesCompat.Builder()
                 .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)

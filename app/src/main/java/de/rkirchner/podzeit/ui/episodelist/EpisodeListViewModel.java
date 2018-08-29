@@ -48,7 +48,7 @@ public class EpisodeListViewModel extends ViewModel {
     }
 
     public void playNow(int episodeId) {
-        playlistManager.playNow(episodeId);
+        playlistManager.addEpisodeAndPlayNow(episodeId);
     }
 
     public void triggerRefresh() {

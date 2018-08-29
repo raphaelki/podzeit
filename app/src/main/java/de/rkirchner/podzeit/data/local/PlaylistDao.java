@@ -19,11 +19,14 @@ public interface PlaylistDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     void insertEntry(PlaylistEntry playlistEntry);
 
-    @Query(value = "SELECT id, isSelected, title, playlistPosition, duration, url FROM podcast_episodes INNER JOIN playlist ON playlist.episodeId = id ORDER BY playlistPosition ASC")
+    @Query(value = "SELECT id, isSelected, podcast_episodes.title AS title, playlistPosition, duration, url, podcast_series.title AS seriesTitle FROM podcast_episodes INNER JOIN playlist ON playlist.episodeId = id INNER JOIN podcast_series ON podcast_series.rss_url = series_rss_url ORDER BY playlistPosition ASC")
     LiveData<List<EpisodePlaylistEntryJoin>> getEpisodesInPlaylist();
 
-    @Query(value = "SELECT id, isSelected, title, playlistPosition, duration, url FROM podcast_episodes INNER JOIN playlist ON playlist.episodeId = id WHERE isSelected = 1")
+    @Query(value = "SELECT id, isSelected, podcast_episodes.title AS title, playlistPosition, duration, url, podcast_series.title AS seriesTitle FROM podcast_episodes INNER JOIN playlist ON playlist.episodeId = id INNER JOIN podcast_series ON podcast_series.rss_url = series_rss_url WHERE isSelected = 1")
     EpisodePlaylistEntryJoin getSelectedEpisodeSync();
+
+    @Query(value = "SELECT * FROM playlist WHERE isSelected=1")
+    PlaylistEntry getSelectedPlaylistEntry();
 
     @Query(value = "SELECT * FROM playlist WHERE episodeId = :episodeId")
     PlaylistEntry getPlaylistEntry(int episodeId);
@@ -47,7 +50,7 @@ public interface PlaylistDao {
     void updateEntries(List<PlaylistEntry> entries);
 
     @Update
-    void updateEntry(PlaylistEntry entry);
+    void updateEntry(PlaylistEntry... entry);
 
     @Delete
     void removeEpisodeFromPlaylist(PlaylistEntry playlistEntry);

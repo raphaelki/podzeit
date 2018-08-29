@@ -176,4 +176,16 @@ public class PodcastRepository {
             }
         }
     }
+
+    public LiveData<Series> getSeriesMatchtingUriAuthority(String uriAuthority) {
+        return seriesDao.getSeriesMatchingUriAuthority(addWildcards(uriAuthority));
+    }
+
+    private String addWildcards(String string) {
+        return "%" + string + "%";
+    }
+
+    public void updateSeries(Series series) {
+        appExecutors.diskIO().execute(() -> seriesDao.updateSeries(series));
+    }
 }

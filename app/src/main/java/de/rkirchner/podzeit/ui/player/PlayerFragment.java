@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ public class PlayerFragment extends DaggerFragment {
     PlaylistManager playlistManager;
     @Inject
     FormatterUtil formatterUtil;
+    private boolean summaryExpanded;
 
     public PlayerFragment() {
         // Required empty public constructor
@@ -86,12 +88,23 @@ public class PlayerFragment extends DaggerFragment {
         binding.playerPrev.setOnClickListener(v -> {
             viewModel.skipToPrevious();
         });
+
+        binding.playerTitle.setOnClickListener(v -> {
+            animateScrollViewChange();
+        });
+        binding.playerSummary.setOnClickListener(v -> {
+            animateScrollViewChange();
+        });
+        binding.playerExpandArrow.setOnClickListener(v -> {
+            animateScrollViewChange();
+        });
         viewModel.getMetadata().observe(this, metadata -> {
             if (metadata != null) {
                 this.metadata = metadata;
                 setDuration(metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
                 binding.playerTitle.setText(metadata.getText(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE));
                 binding.playerTimeBar.setDuration(duration);
+                binding.playerSummary.setText(metadata.getText(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION));
             }
         });
         viewModel.getPlaybackState().observe(this, state -> {
@@ -123,6 +136,30 @@ public class PlayerFragment extends DaggerFragment {
                 viewModel.setPlayerToPosition(position);
             }
         });
+    }
+
+    private void setExpandIcon() {
+        binding.playerExpandArrow.setBackgroundResource(summaryExpanded ? R.drawable.ic_keyboard_arrow_down : R.drawable.ic_keyboard_arrow_up);
+    }
+
+    private void animateScrollViewChange() {
+        int startHeight = 1;
+        int endHeight = 200;
+        if (summaryExpanded) {
+            startHeight = 200;
+            endHeight = 1;
+        }
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(startHeight, endHeight);
+        valueAnimator.setInterpolator(new FastOutSlowInInterpolator());
+        valueAnimator.setDuration(400);
+        valueAnimator.addUpdateListener(animation -> {
+            ViewGroup.LayoutParams layoutParams = binding.playerSummaryScrollView.getLayoutParams();
+            layoutParams.height = (int) animation.getAnimatedValue();
+            binding.playerSummaryScrollView.setLayoutParams(layoutParams);
+        });
+        valueAnimator.start();
+        summaryExpanded = !summaryExpanded;
+        setExpandIcon();
     }
 
     private void setupMediaBarAnimation(long position, float playbackSpeed) {

@@ -81,7 +81,6 @@ public class NotificationBuilder {
 
         builder.setContentTitle(description.getTitle())
                 .setContentText(description.getSubtitle())
-                .setSubText(description.getDescription())
                 .setContentTitle(description.getTitle())
                 .setLargeIcon(description.getIconBitmap())
                 .setContentIntent(mediaController.getSessionActivity())

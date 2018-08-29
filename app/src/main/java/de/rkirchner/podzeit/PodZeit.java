@@ -20,6 +20,4 @@ public class PodZeit extends DaggerApplication {
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
         return DaggerAppComponent.builder().create(this);
     }
-
-
 }

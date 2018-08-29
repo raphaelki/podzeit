@@ -8,4 +8,6 @@ public class Constants {
     public static final String FETCH_SERVICE_BROADCAST_MESSAGE = "fetch_service_broadcast_message";
     public static final String FETCH_SERVICE_EPISODES_STARTED = "start_fetching_episodes";
     public static final String FETCH_SERVICE_EPISODES_FINISHED = "finished_fetching_episodes";
+    public static final String CREDENTIALS_KEY = "credentials";
+    public static final String URI_AUTHORITY_KEY = "uri_authority";
 }

@@ -26,6 +26,7 @@ public class Series {
     private String author;
     private String category;
     private String thumbnailUrl;
+    private String credentials;
 
     private String lastSync;
     private boolean hiddenFromUser = false;
@@ -33,6 +34,14 @@ public class Series {
     private List<Episode> episodes;
 
     public Series() {
+    }
+
+    public String getCredentials() {
+        return credentials;
+    }
+
+    public void setCredentials(String credentials) {
+        this.credentials = credentials;
     }
 
     public String getLastSync() {

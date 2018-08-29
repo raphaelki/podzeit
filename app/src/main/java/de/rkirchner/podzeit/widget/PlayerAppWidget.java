@@ -76,7 +76,6 @@ public class PlayerAppWidget extends AppWidgetProvider implements HasBroadcastRe
             } catch (NullPointerException e) {
                 Timber.w("Player state not available");
             }
-            Timber.d("Player state changed: %s", isPlaying);
             views.setImageViewResource(R.id.widget_play, isPlaying ? R.drawable.exo_controls_pause : R.drawable.exo_controls_play);
 
             PendingIntent showEpisodeDetailsPendingIntent = PendingIntent.getActivity(context, 345, intent, PendingIntent.FLAG_UPDATE_CURRENT);

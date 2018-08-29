@@ -21,13 +21,6 @@ public class PlayerViewModel extends ViewModel {
         } else playbackState.postValue(false);
     };
 
-    private void test() {
-        mediaSessionClient.getMediaMetadata().observeForever(mediaMetadataCompat -> {
-            if (mediaMetadataCompat != null)
-                mediaMetadataCompat.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
-        });
-    }
-
     public LiveData<MediaMetadataCompat> getMetadata() {
         return mediaSessionClient.getMediaMetadata();
     }
