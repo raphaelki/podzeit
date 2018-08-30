@@ -54,4 +54,7 @@ public interface PlaylistDao {
 
     @Delete
     void removeEpisodeFromPlaylist(PlaylistEntry playlistEntry);
+
+    @Query(value = "SELECT COUNT(*) FROM playlist")
+    int getPlaylistEntryCount();
 }

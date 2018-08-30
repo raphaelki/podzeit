@@ -41,7 +41,7 @@ public class PlaylistManager {
     private MediaSessionClient mediaSessionClient;
     private List<QueueItem> queue;
     private Context context;
-    private boolean skipToLastAddedItem = false;
+    private boolean shouldPlayNow = false;
     private int currentlySelectedPlaylistPosition = 0;
     private boolean isInitializing = true;
 
@@ -55,12 +55,11 @@ public class PlaylistManager {
         this.mediaSessionClient.getQueueItems().observeForever(queueItems -> {
             queue = queueItems;
             Timber.d("Queue changed size: %s", queue.size());
-            Timber.d("skip: %s", skipToLastAddedItem);
-            if (skipToLastAddedItem) {
-                mediaSessionClient.getTransportControls().skipToPrevious();
+            Timber.d("skip: %s", shouldPlayNow);
+            if (shouldPlayNow) {
                 mediaSessionClient.getTransportControls().skipToQueueItem(queue.size() - 1);
                 mediaSessionClient.getTransportControls().play();
-                skipToLastAddedItem = false;
+                shouldPlayNow = false;
             }
         });
         this.mediaSessionClient.getIsServiceConnected().observeForever(isServiceConnected -> {
@@ -124,8 +123,13 @@ public class PlaylistManager {
 
     public void addEpisodeAndPlayNow(int episodeId) {
         appExecutors.diskIO().execute(() -> {
-            addEpisodeToPlaylistInternal(episodeId);
-            skipToLastAddedItem = true;
+            int position = addEpisodeToPlaylistInternal(episodeId);
+            if (queue == null || position == queue.size()) {
+                shouldPlayNow = true;
+            } else {
+                mediaSessionClient.getTransportControls().skipToQueueItem(position);
+                mediaSessionClient.getTransportControls().play();
+            }
         });
     }
 
@@ -183,7 +187,7 @@ public class PlaylistManager {
         // if already in the list just play episode at current position
         PlaylistEntry playlistEntry = playlistDao.getPlaylistEntry(episodeId);
         if (playlistEntry == null) {
-            int currentEpisodeCount = playlistDao.getPlaylistEntriesSync().size();
+            int currentEpisodeCount = playlistDao.getPlaylistEntryCount();
             playlistDao.insertEntry(new PlaylistEntry(episodeId, currentEpisodeCount, false));
             mediaSessionClient.getMediaController().addQueueItem(buildMediaDescription(episodeId), currentEpisodeCount);
             return currentEpisodeCount;
