@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="adapter"
+            type="de.rkirchner.podzeit.ui.playlist.PlaylistAdapter" />
+    </data>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -22,6 +28,14 @@
             android:layout_height="match_parent"
             tools:context=".MainActivity">
 
+            <TextView
+                visible="@{adapter.itemCount}"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingBottom="120dp"
+                android:text="No items in playlist. Please add episodes..."
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/playlist_rv"
@@ -38,7 +52,8 @@
                 android:id="@+id/playlist_fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
+                gravity="@{adapter.itemCount}"
+                android:layout_gravity="center"
                 android:layout_margin="@dimen/fab_margin"
                 android:src="@drawable/ic_add"
                 android:tint="#fff"

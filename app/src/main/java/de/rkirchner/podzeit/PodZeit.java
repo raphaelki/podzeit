@@ -2,7 +2,6 @@ package de.rkirchner.podzeit;
 
 import dagger.android.AndroidInjector;
 import dagger.android.support.DaggerApplication;
-import de.rkirchner.podzeit.data.local.PodcastDatabase;
 import de.rkirchner.podzeit.di.DaggerAppComponent;
 import timber.log.Timber;
 
@@ -11,7 +10,7 @@ public class PodZeit extends DaggerApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        deleteDatabase(PodcastDatabase.DATABASE_NAME); // for debugging purposes
+//        deleteDatabase(PodcastDatabase.DATABASE_NAME); // for debugging purposes
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }

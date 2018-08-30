@@ -84,6 +84,8 @@ public class PlaylistFragment extends DaggerFragment {
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(PlaylistViewModel.class);
         viewModel.getPlaylistEpisodes().observe(this, episodes -> {
             adapter.swapList(episodes);
+            binding.setAdapter(adapter);
+            binding.executePendingBindings();
         });
         DrawerLayout drawer = binding.getRoot().getRootView().findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(

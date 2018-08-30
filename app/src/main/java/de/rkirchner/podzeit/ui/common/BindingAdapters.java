@@ -4,6 +4,9 @@ import android.databinding.BindingAdapter;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -76,5 +79,19 @@ public class BindingAdapters {
         if (visible) view.setVisibility(View.VISIBLE);
         else if (!visible && dontRemoveFromLayout) view.setVisibility(View.INVISIBLE);
         else view.setVisibility(View.GONE);
+    }
+
+    @BindingAdapter(value = {"visible"})
+    public static void setVisibility(View view, int count) {
+        if (count == 0) view.setVisibility(View.VISIBLE);
+        else view.setVisibility(View.GONE);
+    }
+
+    @BindingAdapter(value = {"gravity"})
+    public static void setGravity(FloatingActionButton fab, int count) {
+        CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+        if (count == 0) layoutParams.gravity = Gravity.CENTER;
+        else layoutParams.gravity = Gravity.END | Gravity.BOTTOM;
+        fab.setLayoutParams(layoutParams);
     }
 }
