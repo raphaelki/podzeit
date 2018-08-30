@@ -32,6 +32,11 @@ public class PlayerViewModel extends ViewModel {
                 state -> state.getState() == PlaybackStateCompat.STATE_PLAYING);
     }
 
+    public LiveData<Boolean> isPaused() {
+        return Transformations.map(getPlaybackState(),
+                state -> state.getState() == PlaybackStateCompat.STATE_PAUSED);
+    }
+
     public LiveData<Long> getEpisodeDuration() {
         return Transformations.map(getMetadata(),
                 metadata -> metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));

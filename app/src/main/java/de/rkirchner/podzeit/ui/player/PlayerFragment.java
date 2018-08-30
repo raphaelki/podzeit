@@ -43,6 +43,7 @@ public class PlayerFragment extends DaggerFragment {
     private long duration;
     private ValueAnimator progressAnimator;
     private boolean isPlaying;
+    private boolean isPaused;
     private String mediaId;
 
     public PlayerFragment() {
@@ -98,6 +99,9 @@ public class PlayerFragment extends DaggerFragment {
         });
         viewModel.getTitle().observe(this, binding.playerTitle::setText);
         viewModel.getSummary().observe(this, binding.playerSummary::setText);
+        viewModel.isPaused().observe(this, isPaused -> {
+            if (isPaused != null) this.isPaused = isPaused;
+        });
         viewModel.getEpisodeDuration().observe(this, duration -> {
             if (duration != null) {
                 this.duration = duration;
@@ -112,7 +116,11 @@ public class PlayerFragment extends DaggerFragment {
         });
         viewModel.getPlayPosition().observe(this, position -> {
             if (position != null) {
-                playbackPosition = position;
+
+                if (playbackPosition <= position) {
+                    playbackPosition = position;
+                }
+                Timber.d("Playback position: %s, position: %s", playbackPosition, position);
                 updateMediaBarAnimation();
             }
         });
@@ -169,6 +177,11 @@ public class PlayerFragment extends DaggerFragment {
         }
         if (isPlaying) {
             setupMediaBarAnimation();
+        } else if (isPaused) {
+            binding.playerTimeBar.setDuration(duration);
+            binding.playerTimeBar.setPosition(playbackPosition);
+            binding.playerTimeElapsed.setText(formatterUtil.formatMillisecondsDuration((int) playbackPosition));
+            binding.playerTimeLeft.setText(String.format("-%s", formatterUtil.formatMillisecondsDuration((int) duration - (int) playbackPosition)));
         }
     }
 
@@ -184,6 +197,7 @@ public class PlayerFragment extends DaggerFragment {
         progressAnimator.setInterpolator(new LinearInterpolator());
         progressAnimator.addUpdateListener((ValueAnimator animation) -> {
             int timeElapsed = (int) animation.getAnimatedValue();
+            playbackPosition = timeElapsed;
             binding.playerTimeBar.setPosition(timeElapsed);
             binding.playerTimeElapsed.setText(formatterUtil.formatMillisecondsDuration(timeElapsed));
             binding.playerTimeLeft.setText(String.format("-%s", formatterUtil.formatMillisecondsDuration((int) duration - timeElapsed)));
@@ -203,6 +217,7 @@ public class PlayerFragment extends DaggerFragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(Constants.PLAYER_EXPANDED_STATE_KEY, isSummaryExpanded);
+        outState.putLong(Constants.PLAYER_PLAYBACK_POSITION_KEY, playbackPosition);
     }
 
     @Override
@@ -210,6 +225,7 @@ public class PlayerFragment extends DaggerFragment {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
             restoreSummaryExpandedState(savedInstanceState.getBoolean(Constants.PLAYER_EXPANDED_STATE_KEY));
+            playbackPosition = savedInstanceState.getLong(Constants.PLAYER_PLAYBACK_POSITION_KEY);
         }
     }
 
