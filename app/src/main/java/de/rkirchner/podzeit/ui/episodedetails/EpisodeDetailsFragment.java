@@ -6,7 +6,10 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -41,6 +44,12 @@ public class EpisodeDetailsFragment extends DaggerFragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_episode_details, container, false);
@@ -71,12 +80,30 @@ public class EpisodeDetailsFragment extends DaggerFragment {
                     if (episode.getEpisodeId() == 0) {
                         episode.setEpisodeId(episode.getId());
                         viewModel.addToPlaylist();
-//                        setPlaylistAddIcon(true);
                     } else {
                         viewModel.removeFromPlaylist();
                         episode.setEpisodeId(0);
-//                        setPlaylistAddIcon(false);
                     }
                 });
+        setupToolbar();
+    }
+
+    private AppCompatActivity getCompatActivity() {
+        return ((AppCompatActivity) getActivity());
+    }
+
+    private void setupToolbar() {
+        getCompatActivity().setSupportActionBar(binding.episodeDetailsToolbar);
+        ActionBar actionBar = getCompatActivity().getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            getActivity().onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -3,18 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/series_grid_refresh"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <android.support.v7.widget.RecyclerView
-        android:id="@+id/series_grid_rv"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="android.support.v7.widget.GridLayoutManager"
-            app:spanCount="@integer/series_grid_span_count"
-        tools:context=".ui.seriesgrid.SeriesGridFragment"
-        tools:listitem="@layout/series_grid_item" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/series_grid_toolbar"
+            style="@style/AppTheme.PopupOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="6dp"
+            app:title="Podcast Series" />
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/series_grid_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/series_grid_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="android.support.v7.widget.GridLayoutManager"
+                app:spanCount="@integer/series_grid_span_count"
+                tools:context=".ui.seriesgrid.SeriesGridFragment"
+                tools:listitem="@layout/series_grid_item" />
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </LinearLayout>
 </layout>

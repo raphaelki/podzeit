@@ -7,7 +7,10 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -42,6 +45,8 @@ public class SeriesGridFragment extends DaggerFragment {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate");
         gridAdapter = new SeriesGridAdapter(seriesGridClickCallback, glideRequestListener);
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -71,5 +76,25 @@ public class SeriesGridFragment extends DaggerFragment {
                 }
             }
         });
+        setupToolbar();
+    }
+
+    private AppCompatActivity getCompatActivity() {
+        return ((AppCompatActivity) getActivity());
+    }
+
+    private void setupToolbar() {
+        getCompatActivity().setSupportActionBar(binding.seriesGridToolbar);
+        ActionBar actionBar = getCompatActivity().getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            getActivity().onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

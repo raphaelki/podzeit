@@ -7,6 +7,8 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -72,7 +74,7 @@ public class PlaylistFragment extends DaggerFragment {
             }
         });
         binding.playlistRv.setAdapter(adapter);
-        binding.fab.setOnClickListener(view -> navigationController.navigateToSeriesGrid());
+        binding.playlistFab.setOnClickListener(view -> navigationController.navigateToSeriesGrid());
         return binding.getRoot();
     }
 
@@ -83,5 +85,10 @@ public class PlaylistFragment extends DaggerFragment {
         viewModel.getPlaylistEpisodes().observe(this, episodes -> {
             adapter.swapList(episodes);
         });
+        DrawerLayout drawer = binding.getRoot().getRootView().findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                getActivity(), drawer, binding.playlistToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
     }
 }

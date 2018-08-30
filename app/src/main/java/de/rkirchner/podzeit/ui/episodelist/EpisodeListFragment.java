@@ -6,7 +6,10 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -68,6 +71,7 @@ public class EpisodeListFragment extends DaggerFragment {
         super.onCreate(savedInstanceState);
         adapter.setPlaylistListener(playlistListener);
         adapter.setHasStableIds(true);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -105,5 +109,25 @@ public class EpisodeListFragment extends DaggerFragment {
         });
         viewModel.getSeries().observe(this, binding::setSeries);
         viewModel.getEpisodes().observe(this, adapter::swapList);
+        setupToolbar();
+    }
+
+    private AppCompatActivity getCompatActivity() {
+        return ((AppCompatActivity) getActivity());
+    }
+
+    private void setupToolbar() {
+        getCompatActivity().setSupportActionBar(binding.episodeListToolbar);
+        ActionBar actionBar = getCompatActivity().getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            getActivity().onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

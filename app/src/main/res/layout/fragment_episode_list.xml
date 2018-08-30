@@ -29,7 +29,10 @@
                 android:id="@+id/episode_list_collapsing_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_scrollFlags="exitUntilCollapsed|scroll">
+                app:contentScrim="@color/colorPrimary"
+                app:layout_scrollFlags="exitUntilCollapsed|scroll"
+                app:titleEnabled="false"
+                app:toolbarId="@id/episode_list_toolbar">
 
                 <ImageView
                     android:id="@+id/episode_list_iv"
@@ -41,6 +44,21 @@
                     app:layout_collapseMode="parallax"
                     app:layout_collapseParallaxMultiplier="0.5"
                     tools:src="@drawable/wasjetz" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:layout_gravity="top"
+                    android:background="@drawable/details_scrim_top" />
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/episode_list_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:elevation="6dp"
+                    app:layout_collapseMode="pin"
+                    app:title="@{series.title}" />
+
             </android.support.design.widget.CollapsingToolbarLayout>
 
         </android.support.design.widget.AppBarLayout>

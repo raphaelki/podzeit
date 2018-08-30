@@ -7,6 +7,7 @@ import android.support.transition.Slide;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 
 import javax.inject.Inject;
@@ -29,6 +30,7 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
     private final int PLAYER_FRAGMENT_FRAME_ID = R.id.player_fragment_frame;
     private final int UPPER_FRAGMENT_FRAME_ID = R.id.upper_fragment_frame;
     private final String PLAYER_FRAGMENT_TAG = "player_fragment";
+    private final String PLAYLIST_FRAGMENT_TAG = "playlist_fragment";
     private Context context;
     private FragmentManager fragmentManager;
 
@@ -61,27 +63,30 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
     }
 
     public void navigateToPlaylist() {
-        PlaylistFragment fragment = new PlaylistFragment();
-        setTransitions(fragment);
+        Fragment fragment = fragmentManager.findFragmentByTag(PLAYLIST_FRAGMENT_TAG);
+        if (fragment == null) {
+            fragment = new PlaylistFragment();
+            setTransitions(fragment);
+        }
         fragmentManager.beginTransaction()
                 .setReorderingAllowed(true)
-                .replace(UPPER_FRAGMENT_FRAME_ID, fragment)
+                .replace(UPPER_FRAGMENT_FRAME_ID, fragment, PLAYLIST_FRAGMENT_TAG)
                 .commit();
     }
 
     public void navigateToSeriesGrid() {
         SeriesGridFragment fragment = new SeriesGridFragment();
-        setTransitionAndNavigateToFragment(fragment);
+        setTransitionAndNavigateToFragment(fragment, true);
     }
 
     private void navigateToEpisodeList(String rssUrl) {
         Fragment fragment = EpisodeListFragment.create(rssUrl);
-        setTransitionAndNavigateToFragment(fragment);
+        setTransitionAndNavigateToFragment(fragment, true);
     }
 
     private void navigateToEpisodeDetails(int episodeId) {
         Fragment fragment = EpisodeDetailsFragment.create(episodeId);
-        setTransitionAndNavigateToFragment(fragment);
+        setTransitionAndNavigateToFragment(fragment, true);
     }
 
     @Override
@@ -101,18 +106,22 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
     }
 
     private void setTransitions(Fragment fragment) {
-        fragment.setExitTransition(new Fade());
-        fragment.setEnterTransition(new Slide(Gravity.RIGHT));
+        Fade fade = new Fade();
+        fade.excludeTarget(Toolbar.class, true);
+        fragment.setExitTransition(fade);
+        Slide slide = new Slide(Gravity.RIGHT);
+        slide.excludeTarget(Toolbar.class, true);
+        fragment.setEnterTransition(slide);
     }
 
     public void navigateToSettings() {
         SettingsFragment fragment = new SettingsFragment();
-        setTransitionAndNavigateToFragment(fragment);
+        setTransitionAndNavigateToFragment(fragment, true);
         hidePlayer();
     }
 
-    private void setTransitionAndNavigateToFragment(Fragment fragment) {
-        setTransitions(fragment);
+    private void setTransitionAndNavigateToFragment(Fragment fragment, boolean setTransition) {
+        if (setTransition) setTransitions(fragment);
         fragmentManager.beginTransaction()
                 .setReorderingAllowed(true)
                 .replace(UPPER_FRAGMENT_FRAME_ID, fragment)
