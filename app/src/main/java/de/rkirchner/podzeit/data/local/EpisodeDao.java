@@ -65,6 +65,13 @@ public interface EpisodeDao {
             "SELECT id, title, summary, duration, pubDate, size, wasPlayed, episodeId " +
                     "FROM podcast_episodes " +
                     "LEFT JOIN playlist ON playlist.episodeId = podcast_episodes.id " +
+                    "WHERE series_rss_url = :rssUrl AND wasPlayed = 0")
+    LiveData<List<EpisodesPlaylistJoin>> getEpisodesPlaylistJoinForSeriesWithoutPlayed(String rssUrl);
+
+    @Query(value =
+            "SELECT id, title, summary, duration, pubDate, size, wasPlayed, episodeId " +
+                    "FROM podcast_episodes " +
+                    "LEFT JOIN playlist ON playlist.episodeId = podcast_episodes.id " +
                     "WHERE id = :episodeId")
     LiveData<EpisodesPlaylistJoin> getEpisodesPlaylistJoinForEpisode(int episodeId);
 

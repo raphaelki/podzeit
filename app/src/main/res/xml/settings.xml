@@ -10,7 +10,7 @@
             android:title="Remove after playback" />
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="hide_played"
+            android:key="@string/shared_pref_hide_played_key"
             android:layout="@layout/custom_settings_layout"
             android:summary="Hide already played eisodes in the series catalog"
             android:title="Hide played episode in catalog" />

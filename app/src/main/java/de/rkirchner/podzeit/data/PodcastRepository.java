@@ -143,6 +143,10 @@ public class PodcastRepository {
         return episodeDao.getEpisodesPlaylistJoinForSeries(rssUrl);
     }
 
+    public LiveData<List<EpisodesPlaylistJoin>> getEpisodesPlaylistJoinForSeriesWithoutPlayed(String rssUrl) {
+        return episodeDao.getEpisodesPlaylistJoinForSeriesWithoutPlayed(rssUrl);
+    }
+
     public void triggerRefreshForRssUrl(String rssUrl) {
         Intent intent = new Intent();
         intent.putExtra(Constants.RSS_URL_KEY, rssUrl);

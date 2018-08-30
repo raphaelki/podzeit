@@ -4,11 +4,15 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.v7.preference.PreferenceManager;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
+import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.data.DataState;
 import de.rkirchner.podzeit.data.PodcastRepository;
 import de.rkirchner.podzeit.data.models.EpisodesPlaylistJoin;
@@ -20,10 +24,12 @@ public class EpisodeListViewModel extends ViewModel {
     private final MutableLiveData<String> seriesRssUrl = new MutableLiveData<>();
     private PodcastRepository repository;
     private PlaylistManager playlistManager;
+    private Context context;
 
     @Inject
-    public EpisodeListViewModel(PodcastRepository repository, PlaylistManager playlistManager) {
+    public EpisodeListViewModel(PodcastRepository repository, PlaylistManager playlistManager, Context context) {
         this.repository = repository;
+        this.context = context;
         this.playlistManager = playlistManager;
     }
 
@@ -36,8 +42,15 @@ public class EpisodeListViewModel extends ViewModel {
     }
 
     public LiveData<List<EpisodesPlaylistJoin>> getEpisodes() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean hidePlayed = sharedPreferences.getBoolean(context.getString(R.string.shared_pref_hide_played_key), false);
+        if (hidePlayed) {
+            return Transformations.switchMap(seriesRssUrl,
+                    rssUrl -> repository.getEpisodesPlaylistJoinForSeriesWithoutPlayed(rssUrl));
+        }
         return Transformations.switchMap(seriesRssUrl, rssUrl -> repository.getEpisodesPlaylistJoinForSeries(rssUrl));
     }
+
 
     public void addEpisodeToPlaylist(int episodeId) {
         playlistManager.addEpisodeToPlaylist(episodeId);

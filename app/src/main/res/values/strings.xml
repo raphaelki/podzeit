@@ -102,4 +102,5 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="shared_pref_hide_played_key">hide_played</string>
 </resources>
