@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="Settings">
-    <CheckBoxPreference android:title="Remove episode from playlist after playback" />
-    <CheckBoxPreference android:title="Hide played episode in catalog" />
-    <MultiSelectListPreference android:title="Seconds to skip on rewind/fast-forward" />
-    <Preference android:title="ZEIT Audio Sign in">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:targetClass="de.rkirchner.podzeit.ui.logindialog.LoginActivity"
-            android:targetPackage="de.rkirchner.podzeit" />
-    </Preference>
+    <PreferenceCategory android:title="Preferences">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="remove_after_playback"
+            android:layout="@layout/custom_settings_layout"
+            android:summary="Remove episode from playlist after playback"
+            android:title="Remove after playback" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="hide_played"
+            android:layout="@layout/custom_settings_layout"
+            android:summary="Hide already played eisodes in the series catalog"
+            android:title="Hide played episode in catalog" />
+        <ListPreference
+            android:defaultValue="15"
+            android:entries="@array/skip_seconds_entries"
+            android:entryValues="@array/skip_seconds_values"
+            android:key="seconds_to_skip"
+            android:layout="@layout/custom_settings_layout"
+            android:summary="Skipping %s seconds on rewind or fast-forward"
+            android:title="Seconds to skip" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

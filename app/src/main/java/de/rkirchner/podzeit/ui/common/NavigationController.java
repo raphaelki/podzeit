@@ -116,7 +116,9 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
 
     public void navigateToSettings() {
         SettingsFragment fragment = new SettingsFragment();
-        setTransitionAndNavigateToFragment(fragment, true);
+        fragment.setEnterTransition(new Fade());
+        fragment.setExitTransition(new Fade());
+        setTransitionAndNavigateToFragment(fragment, false);
         hidePlayer();
     }
 
