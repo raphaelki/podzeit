@@ -34,6 +34,7 @@ import timber.log.Timber;
 public class PodcastRepository {
 
     private final String FIREBASE_URL_KEY = "url";
+    private final String FIREBASE_NEEDS_CREDENTIALS_KEY = "needsCredentials";
 
     private DatabaseReference firebaseReference;
     private SeriesDao seriesDao;
@@ -86,7 +87,8 @@ public class PodcastRepository {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 String url = getUrlFromSnapshot(dataSnapshot);
-                compareToRoom(url);
+                boolean needsCredentials = getNeedsCredentialsFromSnapshot(dataSnapshot);
+                compareToRoom(url, needsCredentials);
                 Timber.d("Firebase child added: %s", url);
             }
 
@@ -118,13 +120,18 @@ public class PodcastRepository {
         return dataSnapshot.child(FIREBASE_URL_KEY).getValue(String.class);
     }
 
-    private void compareToRoom(String url) {
+    private boolean getNeedsCredentialsFromSnapshot(DataSnapshot dataSnapshot) {
+        return dataSnapshot.child(FIREBASE_NEEDS_CREDENTIALS_KEY).getValue(Boolean.class);
+    }
+
+    private void compareToRoom(String url, boolean needsCredentials) {
         appExecutors.diskIO().execute(() -> {
             Series series = seriesDao.getSeriesSync(url);
             if (series == null) {
                 Timber.d("Series with URL %s does not exist in local database. Starting fetch.", url);
                 Intent intent = new Intent();
                 intent.putExtra(Constants.RSS_URL_KEY, url);
+                intent.putExtra(Constants.NEEDS_CREDENTIALS_KEY, needsCredentials);
                 FetchService.enqueueWork(context, intent);
             } else {
                 Timber.d("Series with URL %s already exists in local database", url);

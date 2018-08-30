@@ -55,8 +55,9 @@ public class FetchService extends JobIntentService {
     protected void onHandleWork(@NonNull Intent intent) {
         if (intent.hasExtra(Constants.RSS_URL_KEY)) {
             String url = intent.getStringExtra(Constants.RSS_URL_KEY);
+            boolean needsCredentials = intent.getBooleanExtra(Constants.NEEDS_CREDENTIALS_KEY, false);
             fetchStatusBroadcaster.fireBroadcast(Constants.FETCH_SERVICE_EPISODES_STARTED);
-            startFetchForUrl(url);
+            startFetchForUrl(url, needsCredentials);
             fetchStatusBroadcaster.fireBroadcast(Constants.FETCH_SERVICE_EPISODES_FINISHED);
         }
     }
@@ -80,11 +81,12 @@ public class FetchService extends JobIntentService {
     }
 
     @WorkerThread
-    private void startFetchForUrl(String url) {
+    private void startFetchForUrl(String url, boolean needsCredentials) {
         SeriesRSSFeedService rssFeedService = buildRSSFeedService(url);
         try {
             Series series = rssFeedService.getMP3Feed().execute().body();
             series.setRssUrl(url);
+            series.setNeedsCredentials(needsCredentials);
             for (Episode episode : series.getEpisodes()) {
                 episode.setSeriesRssUrl(url);
             }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/episode_details_menu_singin"
+        android:icon="@drawable/ic_vpn_key"
+        android:iconTint="#c1000000"
+        android:title="Edit credentials"
+        app:showAsAction="always" />
+</menu>

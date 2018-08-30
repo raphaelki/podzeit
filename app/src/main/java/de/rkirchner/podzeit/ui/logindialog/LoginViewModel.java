@@ -30,7 +30,6 @@ public class LoginViewModel extends ViewModel {
         seriesToUpdate.setCredentials(encodeCredentials(username, password));
         repository.updateSeries(seriesToUpdate);
         playlistManager.initializeMediaQueue();
-        playlistManager.playCurrentlySelectedEpisode();
     }
 
     public void setAuthority(String uriAuthority) {

@@ -3,12 +3,16 @@ package de.rkirchner.podzeit.ui.episodelist;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +25,7 @@ import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.databinding.FragmentEpisodeListBinding;
 import de.rkirchner.podzeit.ui.common.FormatterUtil;
 import de.rkirchner.podzeit.ui.common.GlideRequestListener;
+import de.rkirchner.podzeit.ui.logindialog.LoginActivity;
 
 public class EpisodeListFragment extends DaggerFragment {
 
@@ -34,9 +39,11 @@ public class EpisodeListFragment extends DaggerFragment {
     EpisodeListAdapter adapter;
     private FragmentEpisodeListBinding binding;
     private EpisodeListViewModel viewModel;
+    private String seriesRssUrl;
     private GlideRequestListener glideRequestListener = () -> {
         startPostponedEnterTransition();
     };
+    private boolean seriesNeedsCredentials = false;
     private PlaylistListener playlistListener = new PlaylistListener() {
         @Override
         public void onAddToPlaylist(int episodeId) {
@@ -89,7 +96,7 @@ public class EpisodeListFragment extends DaggerFragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(EpisodeListViewModel.class);
         if (getArguments() != null && getArguments().containsKey(Constants.RSS_URL_KEY)) {
-            String seriesRssUrl = getArguments().getString(Constants.RSS_URL_KEY);
+            seriesRssUrl = getArguments().getString(Constants.RSS_URL_KEY);
             viewModel.setSeries(seriesRssUrl);
         }
         binding.episodeListSwipeToRefresh.setOnRefreshListener(() -> {
@@ -107,7 +114,12 @@ public class EpisodeListFragment extends DaggerFragment {
                 }
             }
         });
-        viewModel.getSeries().observe(this, binding::setSeries);
+        viewModel.getSeries().observe(this, series -> {
+            if (series != null) {
+                binding.setSeries(series);
+                seriesNeedsCredentials = series.getNeedsCredentials();
+            }
+        });
         viewModel.getEpisodes().observe(this, adapter::swapList);
         setupToolbar();
     }
@@ -123,11 +135,26 @@ public class EpisodeListFragment extends DaggerFragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (seriesNeedsCredentials) inflater.inflate(R.menu.episode_list_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            getActivity().onBackPressed();
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getActivity().onBackPressed();
+                return true;
+            case R.id.episode_details_menu_singin:
+                String authority = Uri.parse(seriesRssUrl).getAuthority();
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.putExtra(Constants.URI_AUTHORITY_KEY, authority);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+
     }
 }

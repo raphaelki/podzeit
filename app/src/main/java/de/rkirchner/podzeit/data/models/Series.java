@@ -27,6 +27,15 @@ public class Series {
     private String category;
     private String thumbnailUrl;
     private String credentials;
+    private boolean needsCredentials;
+
+    public boolean getNeedsCredentials() {
+        return needsCredentials;
+    }
+
+    public void setNeedsCredentials(boolean needsCredentials) {
+        this.needsCredentials = needsCredentials;
+    }
 
     private String lastSync;
     private boolean hiddenFromUser = false;

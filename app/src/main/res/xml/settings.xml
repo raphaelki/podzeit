@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Settings">
     <CheckBoxPreference android:title="Remove episode from playlist after playback" />
     <CheckBoxPreference android:title="Hide played episode in catalog" />
     <MultiSelectListPreference android:title="Seconds to skip on rewind/fast-forward" />
-    <EditTextPreference android:title="ZEIT E-Mail" />
-    <EditTextPreference android:title="Password" />
+    <Preference android:title="ZEIT Audio Sign in">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="de.rkirchner.podzeit.ui.logindialog.LoginActivity"
+            android:targetPackage="de.rkirchner.podzeit" />
+    </Preference>
 </PreferenceScreen>
