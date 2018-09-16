@@ -14,7 +14,7 @@ import javax.inject.Inject;
 
 import de.rkirchner.podzeit.Constants;
 import de.rkirchner.podzeit.R;
-import de.rkirchner.podzeit.SettingsFragment;
+import de.rkirchner.podzeit.ui.SettingsFragment;
 import de.rkirchner.podzeit.ui.episodedetails.EpisodeDetailsFragment;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListClickCallback;
 import de.rkirchner.podzeit.ui.episodelist.EpisodeListFragment;
@@ -119,7 +119,7 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
         fragment.setEnterTransition(new Fade());
         fragment.setExitTransition(new Fade());
         setTransitionAndNavigateToFragment(fragment, false);
-        hidePlayer();
+//        hidePlayer();
     }
 
     private void setTransitionAndNavigateToFragment(Fragment fragment, boolean setTransition) {

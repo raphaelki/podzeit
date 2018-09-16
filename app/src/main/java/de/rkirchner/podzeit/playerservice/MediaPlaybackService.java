@@ -23,6 +23,7 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ext.mediasession.DefaultPlaybackController;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueEditor;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
@@ -44,6 +45,7 @@ import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.local.PlaylistDao;
 import de.rkirchner.podzeit.data.models.Episode;
 import de.rkirchner.podzeit.data.models.PlaylistEntry;
+import de.rkirchner.podzeit.playerclient.PlaylistManager;
 import timber.log.Timber;
 
 public class MediaPlaybackService extends MediaBrowserServiceCompat {
@@ -57,6 +59,8 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     AppExecutors appExecutors;
     @Inject
     PlaylistDao playlistDao;
+    @Inject
+    PlaylistManager playlistManager;
     private MediaSessionCompat mediaSession;
     private MediaSessionConnector mediaSessionConnector;
     private MediaControllerCallback controllerCallback;
@@ -69,17 +73,39 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     private PlaybackStateCompat lastPlaybackState;
     private long currentPlaybackPosition;
     private long currentTrackDuration = -1;
+    private int rewFfwSeconds = 15;
+
     private Runnable positionTracker = new Runnable() {
         @Override
         public void run() {
             if (player != null) {
                 currentPlaybackPosition = player.getCurrentPosition();
-                Timber.d("Buffered: %s %s", player.getBufferedPercentage(), player.getBufferedPosition());
+//                Timber.d("Buffered: %s %s", player.getBufferedPercentage(), player.getBufferedPosition());
             }
             handler.postDelayed(this, 1000);
         }
     };
     private long previousPlaybackPosition;
+    private boolean removeEpisodeAfterPlayback = false;
+    private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceListener =
+            (sharedPreferences, key) -> {
+                if (key.equals(getString(R.string.shared_pref_remove_after_playback_key))) {
+                    setRemoveEpisodeAfterPlayback(sharedPreferences);
+                } else if (key.equals(getString(R.string.shared_pref_seconds_to_skip_key))) {
+                    setRewFfwSeconds(sharedPreferences);
+                }
+            };
+
+    private void setRewFfwSeconds(SharedPreferences sharedPreferences) {
+        String seconds = sharedPreferences.getString(getString(R.string.shared_pref_seconds_to_skip_key), "15");
+        rewFfwSeconds = Integer.parseInt(seconds);
+        Timber.d("rew ffw seconds set to %s", rewFfwSeconds);
+    }
+
+    private void setRemoveEpisodeAfterPlayback(SharedPreferences sharedPreferences) {
+        removeEpisodeAfterPlayback = sharedPreferences.getBoolean(getString(R.string.shared_pref_remove_after_playback_key), false);
+        Timber.d("remove episode after playback: %s", removeEpisodeAfterPlayback);
+    }
 
     @Nullable
     @Override
@@ -131,7 +157,32 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
             }
         });
 
-        mediaSessionConnector = new MediaSessionConnector(mediaSession);
+        DefaultPlaybackController playbackController = new DefaultPlaybackController() {
+            @Override
+            public void onPlay(Player player) {
+                super.onPlay(player);
+                Timber.d("Play ");
+            }
+
+            @Override
+            public void onFastForward(Player player) {
+                Timber.d("Ffw %s seconds", rewFfwSeconds);
+                if (rewFfwSeconds <= 0) {
+                    return;
+                }
+                onSeekTo(player, player.getCurrentPosition() + rewFfwSeconds * 1000);
+            }
+
+            @Override
+            public void onRewind(Player player) {
+                Timber.d("Rew %s seconds", rewFfwSeconds);
+                if (rewFfwSeconds <= 0) {
+                    return;
+                }
+                onSeekTo(player, player.getCurrentPosition() - rewFfwSeconds * 1000);
+            }
+        };
+        mediaSessionConnector = new MediaSessionConnector(mediaSession, playbackController);
         mediaSessionConnector.setPlayer(player, null);
 
         List<MediaDescriptionCompat> queue = new ArrayList<>();
@@ -155,13 +206,17 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
             if (throwable.getSourceException() instanceof InvalidResponseCodeException) {
                 InvalidResponseCodeException exception = ((InvalidResponseCodeException) throwable.getSourceException());
                 errorCode = exception.responseCode;
-                message = exception.dataSpec.uri.getAuthority();
+                message = exception.getMessage();
             }
             return new Pair<>(errorCode, message);
         });
         // Set the session's token so that client activities can communicate with it.
         setSessionToken(mediaSession.getSessionToken());
         handler.post(positionTracker);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceListener);
+        setRewFfwSeconds(sharedPreferences);
+        setRemoveEpisodeAfterPlayback(sharedPreferences);
     }
 
     private void obtainPlayerInstance() {
@@ -187,7 +242,7 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
                     }
                 }
                 if (reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION) {
-                    Timber.d("Current track ended");
+                    Timber.d("Current track ended: %s", getActiveQueueItemDescription().getTitle());
                     onEpisodeCompleted(getActiveQueueItemDescription());
                     savePlaybackPositionAndSelectEpisode();
                 }
@@ -237,14 +292,13 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
             Episode previousEpisode = episodeDao.getEpisodeForUrl(completedEpisode.getMediaId());
             if (previousEpisode != null) {
                 PlaylistEntry playlistEntry = playlistDao.getPlaylistEntry(previousEpisode.getId());
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                if (sharedPreferences != null) {
-                    boolean removeEpisode = sharedPreferences.getBoolean(getString(R.string.shared_pref_remove_after_playback_key), false);
-                    if (removeEpisode) playlistDao.removeEpisodeFromPlaylist(playlistEntry);
-                    else {
-                        playlistEntry.setPlaybackPosition(0);
-                        playlistDao.updateEntry(playlistEntry);
-                    }
+                if (removeEpisodeAfterPlayback) {
+                    handler.postDelayed(() -> {
+                        playlistManager.removeEpisodeFromPlaylist(playlistEntry.getEpisodeId());
+                    }, 500);
+                } else {
+                    playlistEntry.setPlaybackPosition(0);
+                    playlistDao.updateEntry(playlistEntry);
                 }
                 previousEpisode.setWasPlayed(true);
                 episodeDao.updateEpisode(previousEpisode);
@@ -258,6 +312,8 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         mediaSession.setActive(false);
         mediaSession.release();
         handler.removeCallbacksAndMessages(null);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(sharedPreferenceListener);
     }
 
     @Override

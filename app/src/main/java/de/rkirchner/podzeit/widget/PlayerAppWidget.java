@@ -6,16 +6,12 @@ import android.appwidget.AppWidgetProvider;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.RemoteViews;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.AppWidgetTarget;
-import com.bumptech.glide.request.transition.Transition;
 
 import javax.inject.Inject;
 
@@ -54,19 +50,13 @@ public class PlayerAppWidget extends AppWidgetProvider implements HasBroadcastRe
             MetadataJoin currentEpisode = repository.getCurrentlySelectedEpisodeSync();
             if (currentEpisode != null) {
                 views.setTextViewText(R.id.widget_title, currentEpisode.getEpisodeTitle());
-                AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, 144, 144, R.id.widget_thumbnail, views, appWidgetId) {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        super.onResourceReady(resource, transition);
-                    }
-                };
+                AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, 144, 144, R.id.widget_thumbnail, views, appWidgetId);
                 appExecutors.mainThread().execute(() -> {
                     Glide.with(context.getApplicationContext())
                             .asBitmap()
                             .load(currentEpisode.getThumbnailUrl())
                             .into(appWidgetTarget);
                 });
-
                 // setup intent to show episode details
                 intent.putExtra(Constants.EPISODE_ID_KEY, currentEpisode.getId());
             }

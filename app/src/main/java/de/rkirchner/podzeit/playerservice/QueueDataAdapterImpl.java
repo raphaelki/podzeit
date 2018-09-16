@@ -33,9 +33,7 @@ public class QueueDataAdapterImpl implements TimelineQueueEditor.QueueDataAdapte
 
     @Override
     public void remove(int position) {
-        if (mediaControllerCompat.getPlaybackState().getActiveQueueItemId() == position) {
-            mediaControllerCompat.getTransportControls().skipToQueueItem(position - 1);
-        }
+//        mediaControllerCompat.getTransportControls().skipToQueueItem(position);
         queue.remove(position);
     }
 

@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.WorkerThread;
 import android.support.v4.media.MediaDescriptionCompat;
-import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat.QueueItem;
 
 import com.bumptech.glide.Glide;
@@ -25,10 +24,8 @@ import de.rkirchner.podzeit.Constants;
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.local.PlaylistDao;
-import de.rkirchner.podzeit.data.models.Episode;
 import de.rkirchner.podzeit.data.models.MetadataJoin;
 import de.rkirchner.podzeit.data.models.PlaylistEntry;
-import de.rkirchner.podzeit.widget.WidgetHelper;
 import timber.log.Timber;
 
 @Singleton
@@ -41,8 +38,6 @@ public class PlaylistManager {
     private List<QueueItem> queue;
     private Context context;
     private boolean shouldPlayNow = false;
-//    private int currentlySelectedPlaylistPosition = 0;
-//    private boolean isInitializing = true;
 
     @Inject
     public PlaylistManager(PlaylistDao playlistDao, EpisodeDao episodeDao, AppExecutors appExecutors, MediaSessionClient mediaSessionClient, Context context) {
@@ -81,18 +76,9 @@ public class PlaylistManager {
             }
             PlaylistEntry episode = playlistDao.getSelectedPlaylistEntry();
             if (episode != null) {
-//                currentlySelectedPlaylistPosition = episode.getPlaylistPosition();
                 mediaSessionClient.getTransportControls().skipToQueueItem(episode.getPlaylistPosition());
-//                Timber.d("Restoring playback position: %s", episode.getPlaybackPosition());
-//                mediaSessionClient.getTransportControls().seekTo(episode.getPlaybackPosition());
-
             }
-            mediaSessionClient.getMediaMetadata().observeForever(this::onMediaDataChanged);
         });
-    }
-
-    private void onMediaDataChanged(MediaMetadataCompat mediaMetadata) {
-        WidgetHelper.triggerWidgetUpdate(context);
     }
 
     public void addEpisodeAndPlayNow(int episodeId) {
@@ -107,15 +93,9 @@ public class PlaylistManager {
         });
     }
 
-
     public void playPlaylistEntry(int playlistPosition) {
-        appExecutors.diskIO().execute(() -> {
-            PlaylistEntry playlistEntry = playlistDao.getPlaylistEntryAtPosition(playlistPosition);
-            mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
-            mediaSessionClient.getTransportControls().play();
-//            mediaSessionClient.getTransportControls().seekTo(playlistEntry.getPlaybackPosition());
-        });
-
+        mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
+        mediaSessionClient.getTransportControls().play();
     }
 
     @WorkerThread
@@ -226,18 +206,5 @@ public class PlaylistManager {
         playlistDao.updateEntries(entriesToReorder);
         playlistDao.removeEpisodeFromPlaylist(entry);
         mediaSessionClient.getMediaController().removeQueueItem(buildMediaDescription(entry.getEpisodeId()));
-    }
-
-    public void currentEpisodeFinished(String mediaId) {
-        appExecutors.diskIO().execute(() -> {
-            for (QueueItem item : queue) {
-                if (item.getDescription().getMediaId().equals(mediaId)) {
-                    Episode episode = episodeDao.getEpisodeForUrl(mediaId);
-                    episode.setWasPlayed(true);
-                    episodeDao.updateEpisode(episode);
-                    break;
-                }
-            }
-        });
     }
 }

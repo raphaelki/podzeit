@@ -1,9 +1,13 @@
 package de.rkirchner.podzeit;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
@@ -22,6 +26,13 @@ public class MainActivity extends DaggerAppCompatActivity
 
     @Inject
     NavigationController navigationController;
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Snackbar.make(findViewById(R.id.upper_fragment_frame), "Error loading episode. No internet connection?", Snackbar.LENGTH_LONG).show();
+        }
+    };
+    private IntentFilter intentFilter = new IntentFilter(Constants.ERROR_BROADCAST);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,5 +87,17 @@ public class MainActivity extends DaggerAppCompatActivity
         if (intent.hasExtra(Constants.EPISODE_ID_KEY)) {
             navigationController.onEpisodeSelected(intent.getIntExtra(Constants.EPISODE_ID_KEY, 0));
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(broadcastReceiver);
     }
 }
