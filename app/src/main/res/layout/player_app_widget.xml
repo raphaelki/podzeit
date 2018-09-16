@@ -2,7 +2,7 @@
     android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
-    tools:layout_height="100dp"
+    tools:layout_height="85dp"
     android:background="#fff"
     android:padding="@dimen/widget_margin">
 
@@ -14,7 +14,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_margin="8dp"
+        android:layout_margin="4dp"
         android:layout_toEndOf="@id/widget_thumbnail"
         android:contentDescription="@string/appwidget_text"
         android:ellipsize="end"
@@ -22,7 +22,8 @@
         android:lines="2"
         android:text="No episode loaded"
         android:textSize="15sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:text="Die Dichterin Julia Engelmann übernimmt mehr Verantwortung" />
 
     <ImageView
         android:id="@+id/widget_thumbnail"
@@ -47,15 +48,15 @@
             style="@style/MediaButtons"
             android:src="@drawable/exo_controls_previous"
             android:layout_width="60dp"
-            android:layout_height="40dp"
+            android:layout_height="35dp"
             android:scaleType="fitCenter"
             android:tint="#99000000" />
 
         <ImageButton
             android:id="@+id/widget_play"
             android:layout_width="60dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="8dp"
+            android:layout_height="35dp"
+            android:layout_marginBottom="4dp"
             style="@style/MediaButtons"
             android:scaleType="fitCenter"
             android:src="@drawable/exo_controls_play"
@@ -66,7 +67,7 @@
             style="@style/MediaButtons"
             android:src="@drawable/exo_controls_next"
             android:layout_width="60dp"
-            android:layout_height="40dp"
+            android:layout_height="35dp"
             android:scaleType="fitCenter"
             android:tint="#99000000" />
 

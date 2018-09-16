@@ -128,6 +128,7 @@ public class MediaSessionClient {
 
         @Override
         public void onQueueTitleChanged(CharSequence title) {
+            Timber.d("onQueueTitleChanged");
             super.onQueueTitleChanged(title);
         }
 
@@ -175,7 +176,7 @@ public class MediaSessionClient {
                 errorHandler.handleError(state.getErrorCode(), state.getErrorMessage().toString());
             }
             WidgetHelper.triggerWidgetUpdate(context);
-            Timber.d("Playback state changed: %s", state.getState());
+            Timber.d("Playback state changed: %s", state.toString());
             tempPlaybackState = state;
         }
 
@@ -186,6 +187,8 @@ public class MediaSessionClient {
 
         @Override
         public void onMetadataChanged(MediaMetadataCompat metadata) {
+            if (metadata != null)
+                Timber.d("Metadata changed: %s", metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
             mediaMetadata.postValue(metadata);
             tempMediaMetadata = metadata;
         }

@@ -77,7 +77,7 @@ public class BindingAdapters {
     @BindingAdapter(value = {"visible", "dontRemoveFromLayout"}, requireAll = false)
     public static void setVisibility(View view, boolean visible, boolean dontRemoveFromLayout) {
         if (visible) view.setVisibility(View.VISIBLE);
-        else if (!visible && dontRemoveFromLayout) view.setVisibility(View.INVISIBLE);
+        else if (dontRemoveFromLayout) view.setVisibility(View.INVISIBLE);
         else view.setVisibility(View.GONE);
     }
 

@@ -11,6 +11,15 @@ public class EpisodePlaylistEntryJoin {
     private String url;
     private boolean isSelected;
     private String seriesTitle;
+    private boolean wasPlayed;
+
+    public boolean isWasPlayed() {
+        return wasPlayed;
+    }
+
+    public void setWasPlayed(boolean wasPlayed) {
+        this.wasPlayed = wasPlayed;
+    }
 
     public String getSeriesTitle() {
         return seriesTitle;
@@ -77,6 +86,10 @@ public class EpisodePlaylistEntryJoin {
         return Objects.equals(id, object.id)
                 && Objects.equals(isSelected, object.isSelected)
                 && Objects.equals(title, object.title)
-                && Objects.equals(duration, object.duration);
+                && Objects.equals(duration, object.duration)
+                && Objects.equals(wasPlayed, object.wasPlayed)
+                && Objects.equals(seriesTitle, object.seriesTitle)
+                && Objects.equals(url, object.url)
+                && Objects.equals(playlistPosition, object.playlistPosition);
     }
 }

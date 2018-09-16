@@ -22,30 +22,30 @@ public interface EpisodeDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertEpisodeList(List<Episode> episodeList);
 
-    @Query(value = "SELECT * FROM podcast_episodes WHERE series_rss_url = :rssUrl")
+    @Query(value = "SELECT * FROM episodes WHERE series_rss_url = :rssUrl")
     LiveData<List<Episode>> getEpisodesForSeries(String rssUrl);
 
-    @Query(value = "SELECT * FROM podcast_episodes WHERE id = :episodeId")
+    @Query(value = "SELECT * FROM episodes WHERE id = :episodeId")
     LiveData<Episode> getEpisode(int episodeId);
 
-    @Query(value = "SELECT id, podcast_episodes.title AS episodeTitle, podcast_episodes.summary," +
-            " thumbnailUrl, url, podcast_series.title AS seriesTitle, credentials " +
-            "FROM podcast_episodes " +
-            "LEFT JOIN podcast_series ON podcast_series.rss_url = series_rss_url " +
+    @Query(value = "SELECT id, episodes.title AS episodeTitle, episodes.summary," +
+            " thumbnailUrl, url, series.title AS seriesTitle, credentials " +
+            "FROM episodes " +
+            "LEFT JOIN series ON series.rss_url = series_rss_url " +
             "WHERE id= :episodeId")
     MetadataJoin getEpisodeSync(int episodeId);
 
-    @Query(value = "SELECT id, podcast_episodes.title AS episodeTitle, podcast_episodes.summary, thumbnailUrl, url, podcast_series.title AS seriesTitle, credentials " +
-            "FROM podcast_episodes " +
-            "LEFT JOIN podcast_series ON podcast_series.rss_url = series_rss_url " +
-            "LEFT JOIN playlist ON playlist.episodeId = podcast_episodes.id " +
+    @Query(value = "SELECT id, episodes.title AS episodeTitle, episodes.summary, thumbnailUrl, url, series.title AS seriesTitle, credentials " +
+            "FROM episodes " +
+            "LEFT JOIN series ON series.rss_url = series_rss_url " +
+            "LEFT JOIN playlist ON playlist.episodeId = episodes.id " +
             "WHERE playlist.isSelected = 1")
     MetadataJoin getCurrentlySelectedEpisodeSync();
 
-    @Query(value = "SELECT * FROM podcast_episodes WHERE url = :url")
+    @Query(value = "SELECT * FROM episodes WHERE url = :url")
     Episode getEpisodeForUrl(String url);
 
-    @Query(value = "SELECT * FROM podcast_episodes WHERE id = :episodeId")
+    @Query(value = "SELECT * FROM episodes WHERE id = :episodeId")
     Episode getEpisodeForId(int episodeId);
 
     @Update
@@ -56,25 +56,25 @@ public interface EpisodeDao {
 
     @Query(value =
             "SELECT id, title, summary, duration, pubDate, size, wasPlayed, episodeId " +
-                    "FROM podcast_episodes " +
-                    "LEFT JOIN playlist ON playlist.episodeId = podcast_episodes.id " +
+                    "FROM episodes " +
+                    "LEFT JOIN playlist ON playlist.episodeId = episodes.id " +
                     "WHERE series_rss_url = :rssUrl")
     LiveData<List<EpisodesPlaylistJoin>> getEpisodesPlaylistJoinForSeries(String rssUrl);
 
     @Query(value =
             "SELECT id, title, summary, duration, pubDate, size, wasPlayed, episodeId " +
-                    "FROM podcast_episodes " +
-                    "LEFT JOIN playlist ON playlist.episodeId = podcast_episodes.id " +
+                    "FROM episodes " +
+                    "LEFT JOIN playlist ON playlist.episodeId = episodes.id " +
                     "WHERE series_rss_url = :rssUrl AND wasPlayed = 0")
     LiveData<List<EpisodesPlaylistJoin>> getEpisodesPlaylistJoinForSeriesWithoutPlayed(String rssUrl);
 
     @Query(value =
             "SELECT id, title, summary, duration, pubDate, size, wasPlayed, episodeId " +
-                    "FROM podcast_episodes " +
-                    "LEFT JOIN playlist ON playlist.episodeId = podcast_episodes.id " +
+                    "FROM episodes " +
+                    "LEFT JOIN playlist ON playlist.episodeId = episodes.id " +
                     "WHERE id = :episodeId")
     LiveData<EpisodesPlaylistJoin> getEpisodesPlaylistJoinForEpisode(int episodeId);
 
-    @Query(value = "SELECT COUNT(*) FROM podcast_episodes WHERE series_rss_url = :rssSeriesUrl")
+    @Query(value = "SELECT COUNT(*) FROM episodes WHERE series_rss_url = :rssSeriesUrl")
     int getEpisodeCount(String rssSeriesUrl);
 }

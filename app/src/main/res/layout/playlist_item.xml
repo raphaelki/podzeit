@@ -56,14 +56,17 @@
 
         <TextView
             android:id="@+id/playlist_item_series_title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:gravity="center_horizontal"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:gravity="start"
             android:text="@{episode.seriesTitle}"
             android:textSize="14sp"
+            android:singleLine="true"
             app:layout_constraintStart_toEndOf="@id/playlist_item_duration"
             app:layout_constraintTop_toBottomOf="@id/playlist_item_title"
+            app:layout_constraintEnd_toStartOf="@id/playlist_item_headphone_icon"
             tools:text="Was jetzt?" />
 
         <ImageButton
@@ -75,6 +78,19 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/playlist_item_headphone_icon"
+            dontRemoveFromLayout="true"
+            visible="@{episode.wasPlayed}"
+            android:layout_width="15dp"
+            android:layout_height="0dp"
+            android:background="@null"
+
+            android:src="@drawable/ic_headset"
+            android:tint="#1e9100"
+            app:layout_constraintEnd_toStartOf="@id/playlist_item_swap_icon"
+            app:layout_constraintTop_toBottomOf="@id/playlist_item_title" />
 
 
     </android.support.constraint.ConstraintLayout>

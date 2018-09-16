@@ -26,7 +26,6 @@ import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.local.PlaylistDao;
 import de.rkirchner.podzeit.data.models.Episode;
-import de.rkirchner.podzeit.data.models.EpisodePlaylistEntryJoin;
 import de.rkirchner.podzeit.data.models.MetadataJoin;
 import de.rkirchner.podzeit.data.models.PlaylistEntry;
 import de.rkirchner.podzeit.widget.WidgetHelper;
@@ -42,8 +41,8 @@ public class PlaylistManager {
     private List<QueueItem> queue;
     private Context context;
     private boolean shouldPlayNow = false;
-    private int currentlySelectedPlaylistPosition = 0;
-    private boolean isInitializing = true;
+//    private int currentlySelectedPlaylistPosition = 0;
+//    private boolean isInitializing = true;
 
     @Inject
     public PlaylistManager(PlaylistDao playlistDao, EpisodeDao episodeDao, AppExecutors appExecutors, MediaSessionClient mediaSessionClient, Context context) {
@@ -80,45 +79,20 @@ public class PlaylistManager {
                 mediaSessionClient.getMediaController().removeQueueItem(mediaDescription);
                 mediaSessionClient.getMediaController().addQueueItem(mediaDescription, entry.getPlaylistPosition());
             }
-            EpisodePlaylistEntryJoin episode = playlistDao.getSelectedEpisodeSync();
+            PlaylistEntry episode = playlistDao.getSelectedPlaylistEntry();
             if (episode != null) {
-                currentlySelectedPlaylistPosition = episode.getPlaylistPosition();
+//                currentlySelectedPlaylistPosition = episode.getPlaylistPosition();
                 mediaSessionClient.getTransportControls().skipToQueueItem(episode.getPlaylistPosition());
+//                Timber.d("Restoring playback position: %s", episode.getPlaybackPosition());
+//                mediaSessionClient.getTransportControls().seekTo(episode.getPlaybackPosition());
+
             }
             mediaSessionClient.getMediaMetadata().observeForever(this::onMediaDataChanged);
         });
     }
 
-    public void playCurrentlySelectedEpisode() {
-        appExecutors.diskIO().execute(() -> {
-            EpisodePlaylistEntryJoin episode = playlistDao.getSelectedEpisodeSync();
-            playPlaylistEntry(episode.getPlaylistPosition());
-        });
-    }
-
     private void onMediaDataChanged(MediaMetadataCompat mediaMetadata) {
-        appExecutors.diskIO().execute(() -> {
-            // skip the reset of the selected episode on startup
-            if (isInitializing && currentlySelectedPlaylistPosition != 0) {
-                isInitializing = false;
-                return;
-            }
-            Timber.d("Getting new metadata: %s", mediaMetadata.getDescription().getMediaId());
-            String url = mediaMetadata.getDescription().getMediaId();
-            Episode currentEpisode = episodeDao.getEpisodeForUrl(url);
-            // return in case the episode has been removed as last item
-            if (currentEpisode == null) return;
-            PlaylistEntry toMark = playlistDao.getPlaylistEntry(currentEpisode.getId());
-            PlaylistEntry toUnmark = playlistDao.getSelectedPlaylistEntry();
-            if (toUnmark != null) {
-                toUnmark.setSelected(false);
-                playlistDao.updateEntry(toUnmark);
-            }
-            toMark.setSelected(true);
-            playlistDao.updateEntry(toMark);
-            WidgetHelper.triggerWidgetUpdate(context);
-
-        });
+        WidgetHelper.triggerWidgetUpdate(context);
     }
 
     public void addEpisodeAndPlayNow(int episodeId) {
@@ -135,8 +109,13 @@ public class PlaylistManager {
 
 
     public void playPlaylistEntry(int playlistPosition) {
-        mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
-        mediaSessionClient.getTransportControls().play();
+        appExecutors.diskIO().execute(() -> {
+            PlaylistEntry playlistEntry = playlistDao.getPlaylistEntryAtPosition(playlistPosition);
+            mediaSessionClient.getTransportControls().skipToQueueItem(playlistPosition);
+            mediaSessionClient.getTransportControls().play();
+//            mediaSessionClient.getTransportControls().seekTo(playlistEntry.getPlaybackPosition());
+        });
+
     }
 
     @WorkerThread
@@ -188,7 +167,7 @@ public class PlaylistManager {
         PlaylistEntry playlistEntry = playlistDao.getPlaylistEntry(episodeId);
         if (playlistEntry == null) {
             int currentEpisodeCount = playlistDao.getPlaylistEntryCount();
-            playlistDao.insertEntry(new PlaylistEntry(episodeId, currentEpisodeCount, false));
+            playlistDao.insertEntry(new PlaylistEntry(episodeId, currentEpisodeCount, false, 0));
             mediaSessionClient.getMediaController().addQueueItem(buildMediaDescription(episodeId), currentEpisodeCount);
             return currentEpisodeCount;
         } else return playlistEntry.getPlaylistPosition();

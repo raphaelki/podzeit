@@ -18,7 +18,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 childColumns = "series_rss_url",
                 onDelete = CASCADE),
         indices = {@Index(value = "id"), @Index(value = "url", unique = true), @Index(value = "series_rss_url")},
-        tableName = "podcast_episodes")
+        tableName = "episodes")
 public class Episode {
 
     @PrimaryKey(autoGenerate = true)

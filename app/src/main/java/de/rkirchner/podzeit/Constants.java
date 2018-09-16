@@ -13,6 +13,4 @@ public class Constants {
     public static final String PLAYER_EXPANDED_STATE_KEY = "player_expanded_state";
     public static final String PLAYER_PLAYBACK_POSITION_KEY = "playback_position";
     public static final String NEEDS_CREDENTIALS_KEY = "needs_credentials";
-
-    public static final String SHARED_PREF_HIDE_PLAYED_KEY = "shared_pref_hide_played";
 }

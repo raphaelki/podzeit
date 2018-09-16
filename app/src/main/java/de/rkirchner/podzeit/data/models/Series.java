@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import java.util.List;
 import java.util.Objects;
 
-@Entity(tableName = "podcast_series")
+@Entity(tableName = "series")
 public class Series {
 
     private String title;

@@ -20,25 +20,25 @@ public interface SeriesDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertSeries(Series series);
 
-    @Query("SELECT * FROM podcast_series")
+    @Query("SELECT * FROM series")
     LiveData<List<Series>> getAllSeries();
 
-    @Query("SELECT * FROM podcast_series")
+    @Query("SELECT * FROM series")
     List<Series> getAllSeriesSync();
 
-    @Query("SELECT * FROM podcast_series WHERE rss_url = :rssUrl")
+    @Query("SELECT * FROM series WHERE rss_url = :rssUrl")
     LiveData<Series> getSeries(String rssUrl);
 
-    @Query("SELECT * FROM podcast_series WHERE rss_url = :rssUrls")
+    @Query("SELECT * FROM series WHERE rss_url = :rssUrls")
     LiveData<List<Series>> getSeriesList(String[] rssUrls);
 
-    @Query("SELECT * FROM podcast_series WHERE rss_url = :rssUrl")
+    @Query("SELECT * FROM series WHERE rss_url = :rssUrl")
     Series getSeriesSync(String rssUrl);
 
     @Update
     void updateSeries(Series series);
 
-    @Query("SELECT * FROM podcast_series WHERE rss_url LIKE :uriAuthority")
+    @Query("SELECT * FROM series WHERE rss_url LIKE :uriAuthority")
     LiveData<Series> getSeriesMatchingUriAuthority(String uriAuthority);
 
 }

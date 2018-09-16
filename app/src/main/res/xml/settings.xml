@@ -4,7 +4,7 @@
     <PreferenceCategory android:title="Preferences">
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="remove_after_playback"
+            android:key="@string/shared_pref_remove_after_playback_key"
             android:layout="@layout/custom_settings_layout"
             android:summary="Remove episode from playlist after playback"
             android:title="Remove after playback" />
@@ -18,7 +18,7 @@
             android:defaultValue="15"
             android:entries="@array/skip_seconds_entries"
             android:entryValues="@array/skip_seconds_values"
-            android:key="seconds_to_skip"
+            android:key="@string/shared_pref_seconds_to_skip_key"
             android:layout="@layout/custom_settings_layout"
             android:summary="Skipping %s seconds on rewind or fast-forward"
             android:title="Seconds to skip" />

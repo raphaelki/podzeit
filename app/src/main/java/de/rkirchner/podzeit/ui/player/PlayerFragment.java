@@ -24,7 +24,6 @@ import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.databinding.FragmentPlayerBinding;
 import de.rkirchner.podzeit.playerclient.PlaylistManager;
 import de.rkirchner.podzeit.ui.common.FormatterUtil;
-import timber.log.Timber;
 
 public class PlayerFragment extends DaggerFragment {
 
@@ -116,11 +115,7 @@ public class PlayerFragment extends DaggerFragment {
         });
         viewModel.getPlayPosition().observe(this, position -> {
             if (position != null) {
-
-                if (playbackPosition <= position) {
                     playbackPosition = position;
-                }
-                Timber.d("Playback position: %s, position: %s", playbackPosition, position);
                 updateMediaBarAnimation();
             }
         });
@@ -166,8 +161,10 @@ public class PlayerFragment extends DaggerFragment {
     }
 
     private boolean mediaBarAnimationValuesAreValid() {
-        Timber.d("duration: %s, position: %s, playbackSpeed: %s", duration, playbackPosition, playbackSpeed);
-        return duration >= 0 && playbackPosition >= 0 && playbackSpeed > 0.0f;
+        return duration >= 0 &&
+                playbackPosition >= 0 &&
+                playbackSpeed > 0.0f
+                && playbackPosition < duration;
     }
 
     private void updateMediaBarAnimation() {
@@ -188,10 +185,6 @@ public class PlayerFragment extends DaggerFragment {
     private void setupMediaBarAnimation() {
         if (!mediaBarAnimationValuesAreValid()) return;
         final int timeToEnd = (int) ((duration - playbackPosition) / playbackSpeed);
-        if (playbackPosition > duration) {
-            onEpisodeFinished();
-            return;
-        }
         binding.playerTimeBar.setDuration(duration);
         progressAnimator = ValueAnimator.ofInt((int) playbackPosition, (int) duration).setDuration(timeToEnd);
         progressAnimator.setInterpolator(new LinearInterpolator());
@@ -201,16 +194,8 @@ public class PlayerFragment extends DaggerFragment {
             binding.playerTimeBar.setPosition(timeElapsed);
             binding.playerTimeElapsed.setText(formatterUtil.formatMillisecondsDuration(timeElapsed));
             binding.playerTimeLeft.setText(String.format("-%s", formatterUtil.formatMillisecondsDuration((int) duration - timeElapsed)));
-            if (timeElapsed == duration) {
-                onEpisodeFinished();
-            }
         });
         progressAnimator.start();
-    }
-
-    private void onEpisodeFinished() {
-        if (mediaId != null)
-            playlistManager.currentEpisodeFinished(mediaId);
     }
 
     @Override

@@ -15,9 +15,9 @@ import de.rkirchner.podzeit.Constants;
 
 public class MediaSourceFactoryImpl implements TimelineQueueEditor.MediaSourceFactory {
 
-    private final String AUTHORIZATION_REQUEST_KEY = "Authorization";
-    private final String AUTH_PREFIX = "Basic ";
-    private final String USER_AGENT = "zeit";
+    private static final String AUTHORIZATION_REQUEST_KEY = "Authorization";
+    private static final String AUTH_PREFIX = "Basic ";
+    private static final String USER_AGENT = "zeit";
 
     private String userAgent;
 

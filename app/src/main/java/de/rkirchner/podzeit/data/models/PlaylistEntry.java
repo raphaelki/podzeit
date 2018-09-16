@@ -10,11 +10,30 @@ public class PlaylistEntry {
     private int episodeId;
     private int playlistPosition;
     private boolean isSelected;
+    private long playbackPosition;
+    private boolean wasPreviousEpisode;
 
-    public PlaylistEntry(int episodeId, int playlistPosition, boolean isSelected) {
+    public PlaylistEntry(int episodeId, int playlistPosition, boolean isSelected, long playbackPosition) {
         this.episodeId = episodeId;
         this.playlistPosition = playlistPosition;
         this.isSelected = isSelected;
+        this.playbackPosition = playbackPosition;
+    }
+
+    public long getPlaybackPosition() {
+        return playbackPosition;
+    }
+
+    public void setPlaybackPosition(long playbackPosition) {
+        this.playbackPosition = playbackPosition;
+    }
+
+    public boolean isWasPreviousEpisode() {
+        return wasPreviousEpisode;
+    }
+
+    public void setWasPreviousEpisode(boolean wasPreviousEpisode) {
+        this.wasPreviousEpisode = wasPreviousEpisode;
     }
 
     public boolean isSelected() {
