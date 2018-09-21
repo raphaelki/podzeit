@@ -3,7 +3,6 @@ package de.rkirchner.podzeit.ui.playlist;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MotionEventCompat;
 import android.view.MotionEvent;
-import android.view.View;
 
 import java.util.Collections;
 
@@ -40,12 +39,9 @@ public class PlaylistAdapter extends RecyclerViewListAdapter<PlaylistItemBinding
     public void onBindViewHolder(@NonNull BindingViewHolder<PlaylistItemBinding> holder, int position) {
         holder.binding().setEpisode(getList().get(position));
         holder.binding().setFormatter(formatter);
-        holder.binding().playlistItemParent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Timber.d("Playlist item selected");
-                playbackCallback.onStartPlayback(getList().get(position).getPlaylistPosition());
-            }
+        holder.binding().playlistItemParent.setOnClickListener(v -> {
+            Timber.d("Playlist item selected");
+            playbackCallback.onStartPlayback(getList().get(position).getPlaylistPosition());
         });
         if (onStartDragListener != null) {
             holder.binding().playlistItemSwapIcon.setOnTouchListener((v, event) -> {

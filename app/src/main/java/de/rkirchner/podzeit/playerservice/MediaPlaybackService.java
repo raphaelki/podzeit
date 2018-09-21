@@ -3,8 +3,10 @@ package de.rkirchner.podzeit.playerservice;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.MediaBrowserCompat;
@@ -74,13 +76,14 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     private long currentPlaybackPosition;
     private long currentTrackDuration = -1;
     private int rewFfwSeconds = 15;
+    private boolean errorOccured = false;
+    private ConcatenatingMediaSource concatenatingMediaSource;
 
     private Runnable positionTracker = new Runnable() {
         @Override
         public void run() {
             if (player != null) {
                 currentPlaybackPosition = player.getCurrentPosition();
-//                Timber.d("Buffered: %s %s", player.getBufferedPercentage(), player.getBufferedPosition());
             }
             handler.postDelayed(this, 1000);
         }
@@ -121,6 +124,44 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         }
     }
 
+    private MediaSessionConnector.PlaybackPreparer preparer = new MediaSessionConnector.PlaybackPreparer() {
+        @Override
+        public long getSupportedPrepareActions() {
+            return PlaybackStateCompat.ACTION_PREPARE;
+        }
+
+        @Override
+        public void onPrepare() {
+//            player.prepare(concatenatingMediaSource, false, true);
+            Timber.d("Preparing media source");
+        }
+
+        @Override
+        public void onPrepareFromMediaId(String mediaId, Bundle extras) {
+
+        }
+
+        @Override
+        public void onPrepareFromSearch(String query, Bundle extras) {
+
+        }
+
+        @Override
+        public void onPrepareFromUri(Uri uri, Bundle extras) {
+
+        }
+
+        @Override
+        public String[] getCommands() {
+            return new String[0];
+        }
+
+        @Override
+        public void onCommand(Player player, String command, Bundle extras, ResultReceiver cb) {
+
+        }
+    };
+
     @Override
     public void onCreate() {
         AndroidInjection.inject(this);
@@ -132,7 +173,6 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         mediaSession = new MediaSessionCompat(this, LOG_TAG);
         mediaSession.setSessionActivity(sessionActivityPendingIntent);
         mediaSession.setActive(true);
-
         controller = new MediaControllerCompat(this, mediaSession);
         controllerCallback = new MediaControllerCallback(this,
                 mediaSession.getSessionToken());
@@ -156,12 +196,16 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
                 currentTrackDuration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
             }
         });
-
         DefaultPlaybackController playbackController = new DefaultPlaybackController() {
+
             @Override
             public void onPlay(Player player) {
+                if (errorOccured) {
+                    prepareSource();
+                    errorOccured = false;
+                }
                 super.onPlay(player);
-                Timber.d("Play ");
+                Timber.d("Play");
             }
 
             @Override
@@ -183,8 +227,7 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
             }
         };
         mediaSessionConnector = new MediaSessionConnector(mediaSession, playbackController);
-        mediaSessionConnector.setPlayer(player, null);
-
+        mediaSessionConnector.setPlayer(player, preparer);
         List<MediaDescriptionCompat> queue = new ArrayList<>();
         TimelineQueueNavigatorImpl timelineQueueNavigator =
                 new TimelineQueueNavigatorImpl(mediaSession,
@@ -193,20 +236,24 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
                         appExecutors,
                         playlistDao);
         mediaSessionConnector.setQueueNavigator(timelineQueueNavigator);
-        ConcatenatingMediaSource concatenatingMediaSource = new ConcatenatingMediaSource();
+        concatenatingMediaSource = new ConcatenatingMediaSource();
         queueDataAdapter = new QueueDataAdapterImpl(concatenatingMediaSource, queue, controller);
-        mediaSessionConnector.setQueueEditor(new TimelineQueueEditor(controller,
+        MediaSessionConnector.QueueEditor queueEditor = new TimelineQueueEditor(
+                controller,
                 concatenatingMediaSource,
                 queueDataAdapter,
-                new MediaSourceFactoryImpl(this)));
-        player.prepare(concatenatingMediaSource, false, false);
+                new MediaSourceFactoryImpl(this));
+        mediaSessionConnector.setQueueEditor(queueEditor);
+
+        player.prepare(concatenatingMediaSource);
         mediaSessionConnector.setErrorMessageProvider(throwable -> {
+            errorOccured = true;
             int errorCode = 0;
             String message = throwable.getSourceException().getMessage();
             if (throwable.getSourceException() instanceof InvalidResponseCodeException) {
                 InvalidResponseCodeException exception = ((InvalidResponseCodeException) throwable.getSourceException());
                 errorCode = exception.responseCode;
-                message = exception.getMessage();
+                message = exception.getMessage() + " " + exception.dataSpec.uri;
             }
             return new Pair<>(errorCode, message);
         });
@@ -251,6 +298,10 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         });
     }
 
+    private void prepareSource() {
+        player.prepare(concatenatingMediaSource);
+    }
+
     private MediaDescriptionCompat getActiveQueueItemDescription() {
         return queueDataAdapter.getMediaDescription((int) controller.getPlaybackState().getActiveQueueItemId());
     }
@@ -293,9 +344,7 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
             if (previousEpisode != null) {
                 PlaylistEntry playlistEntry = playlistDao.getPlaylistEntry(previousEpisode.getId());
                 if (removeEpisodeAfterPlayback) {
-                    handler.postDelayed(() -> {
-                        playlistManager.removeEpisodeFromPlaylist(playlistEntry.getEpisodeId());
-                    }, 500);
+                    handler.postDelayed(() -> playlistManager.removeEpisodeFromPlaylist(playlistEntry.getEpisodeId()), 500);
                 } else {
                     playlistEntry.setPlaybackPosition(0);
                     playlistDao.updateEntry(playlistEntry);

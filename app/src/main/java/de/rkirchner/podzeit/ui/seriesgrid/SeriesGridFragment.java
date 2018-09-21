@@ -34,7 +34,7 @@ public class SeriesGridFragment extends DaggerFragment {
     private SeriesGridViewModel viewModel;
     private FragmentSeriesGridBinding binding;
     private SeriesGridAdapter gridAdapter;
-    private GlideRequestListener glideRequestListener = () -> startPostponedEnterTransition();
+    private GlideRequestListener glideRequestListener = this::startPostponedEnterTransition;
 
     public SeriesGridFragment() {
         // Required empty public constructor

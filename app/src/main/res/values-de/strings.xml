@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PodZeit</string>
+    <string name="error_invalid_password">Das Passwort ist zu kurz</string>
+    <string name="error_field_required">Das Feld muss ausgefüllt sein</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_sign_in_short">Login</string>
+    <string name="error_invalid_email">Die E-Mail Adresse ist ungültig</string>
+    <string name="prompt_password">Passwort</string>
+    <string name="prompt_email">E-Mail</string>
+    <string name="title_activity_login">Login</string>
+    <string name="now_playing_channel_description">Zeigt die aktuelle Episode</string>
+    <string name="now_playing_channel_name">Sie hören</string>
+</resources>

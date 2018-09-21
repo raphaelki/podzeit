@@ -40,9 +40,7 @@ public class EpisodeListFragment extends DaggerFragment {
     private FragmentEpisodeListBinding binding;
     private EpisodeListViewModel viewModel;
     private String seriesRssUrl;
-    private GlideRequestListener glideRequestListener = () -> {
-        startPostponedEnterTransition();
-    };
+    private GlideRequestListener glideRequestListener = this::startPostponedEnterTransition;
     private boolean seriesNeedsCredentials = false;
     private PlaylistListener playlistListener = new PlaylistListener() {
         @Override
@@ -99,9 +97,7 @@ public class EpisodeListFragment extends DaggerFragment {
             seriesRssUrl = getArguments().getString(Constants.RSS_URL_KEY);
             viewModel.setSeries(seriesRssUrl);
         }
-        binding.episodeListSwipeToRefresh.setOnRefreshListener(() -> {
-            viewModel.triggerRefresh();
-        });
+        binding.episodeListSwipeToRefresh.setOnRefreshListener(() -> viewModel.triggerRefresh());
         viewModel.getRefreshStatus().observe(this, status -> {
             if (status != null) {
                 switch (status) {

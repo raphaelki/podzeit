@@ -16,7 +16,6 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="4dp"
         android:layout_toEndOf="@id/widget_thumbnail"
-        android:contentDescription="@string/appwidget_text"
         android:ellipsize="end"
         android:gravity="center"
         android:lines="2"

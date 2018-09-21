@@ -22,8 +22,7 @@ public class ErrorHandler {
     public void handleError(int errorCode, String message) {
         if (errorCode == UNAUTHORIZED_RESPONSE_CODE) {
             showLoginDialog(getUriAuthority(message));
-        }
-        showErrorMessage();
+        } else showErrorMessage();
     }
 
     private void showErrorMessage() {
@@ -32,7 +31,11 @@ public class ErrorHandler {
     }
 
     private String getUriAuthority(String message) {
-        return Uri.parse(message).getAuthority();
+        String[] split = message.split("(?=http)");
+        if (split.length == 2) {
+            return Uri.parse(split[1]).getAuthority();
+        }
+        return "";
     }
 
     private void showLoginDialog(String uriAuthority) {

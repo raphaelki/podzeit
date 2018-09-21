@@ -1,7 +1,12 @@
 package de.rkirchner.podzeit.playerclient;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.WorkerThread;
@@ -38,6 +43,23 @@ public class PlaylistManager {
     private List<QueueItem> queue;
     private Context context;
     private boolean shouldPlayNow = false;
+    private ConnectivityManager cm;
+    private boolean wasDisconnected = false;
+    private IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null &&
+                    activeNetwork.isConnectedOrConnecting();
+            Timber.d("isConnected: %s", isConnected);
+            if (!isConnected) wasDisconnected = true;
+            else if (wasDisconnected) {
+                mediaSessionClient.getTransportControls().prepare();
+                wasDisconnected = false;
+            }
+        }
+    };
 
     @Inject
     public PlaylistManager(PlaylistDao playlistDao, EpisodeDao episodeDao, AppExecutors appExecutors, MediaSessionClient mediaSessionClient, Context context) {
@@ -62,6 +84,8 @@ public class PlaylistManager {
                 initializeMediaQueue();
             }
         });
+        context.registerReceiver(receiver, intentFilter);
+        cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     public void initializeMediaQueue() {
@@ -136,9 +160,7 @@ public class PlaylistManager {
     }
 
     public void addEpisodeToPlaylist(int episodeId) {
-        appExecutors.diskIO().execute(() -> {
-            addEpisodeToPlaylistInternal(episodeId);
-        });
+        appExecutors.diskIO().execute(() -> addEpisodeToPlaylistInternal(episodeId));
     }
 
     @WorkerThread

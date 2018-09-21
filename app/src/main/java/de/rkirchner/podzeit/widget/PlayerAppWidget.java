@@ -51,12 +51,10 @@ public class PlayerAppWidget extends AppWidgetProvider implements HasBroadcastRe
             if (currentEpisode != null) {
                 views.setTextViewText(R.id.widget_title, currentEpisode.getEpisodeTitle());
                 AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, 144, 144, R.id.widget_thumbnail, views, appWidgetId);
-                appExecutors.mainThread().execute(() -> {
-                    Glide.with(context.getApplicationContext())
-                            .asBitmap()
-                            .load(currentEpisode.getThumbnailUrl())
-                            .into(appWidgetTarget);
-                });
+                appExecutors.mainThread().execute(() -> Glide.with(context.getApplicationContext())
+                        .asBitmap()
+                        .load(currentEpisode.getThumbnailUrl())
+                        .into(appWidgetTarget));
                 // setup intent to show episode details
                 intent.putExtra(Constants.EPISODE_ID_KEY, currentEpisode.getId());
             }

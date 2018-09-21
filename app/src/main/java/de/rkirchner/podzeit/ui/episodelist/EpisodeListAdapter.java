@@ -38,9 +38,7 @@ public class EpisodeListAdapter extends RecyclerViewListAdapter<EpisodeListItemB
                     }
 
                 });
-        holder.binding().episodeListItemPlayIcon.setOnClickListener(v -> {
-            playlistListener.onPlayNow(getList().get(position).getId());
-        });
+        holder.binding().episodeListItemPlayIcon.setOnClickListener(v -> playlistListener.onPlayNow(getList().get(position).getId()));
         holder.binding().executePendingBindings();
     }
 

@@ -71,9 +71,7 @@ public class EpisodeDetailsFragment extends DaggerFragment {
                 binding.setEpisode(episode);
             }
         });
-        binding.episodeDetailsItemPlayIcon.setOnClickListener(v -> {
-            viewModel.playEpisode();
-        });
+        binding.episodeDetailsItemPlayIcon.setOnClickListener(v -> viewModel.playEpisode());
         binding.episodeDetailsItemPlaylistAddIcon.setOnClickListener(
                 v -> {
                     if (episode == null) return;

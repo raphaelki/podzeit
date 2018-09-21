@@ -23,12 +23,14 @@ public class QueueDataAdapterImpl implements TimelineQueueEditor.QueueDataAdapte
 
     @Override
     public MediaDescriptionCompat getMediaDescription(int position) {
+        if (position == -1) return null;
         return queue.get(position);
     }
 
     @Override
     public void add(int position, MediaDescriptionCompat description) {
         queue.add(position, description);
+
     }
 
     @Override

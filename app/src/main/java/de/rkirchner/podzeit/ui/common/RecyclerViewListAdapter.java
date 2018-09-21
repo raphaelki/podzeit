@@ -23,7 +23,7 @@ public abstract class RecyclerViewListAdapter<T extends ViewDataBinding, U> exte
     public BindingViewHolder<T> onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         T binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()),
                 getLayoutId(), parent, false);
-        return new BindingViewHolder<T>(binding);
+        return new BindingViewHolder<>(binding);
     }
 
     @Override

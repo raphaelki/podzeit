@@ -17,6 +17,7 @@ import de.rkirchner.podzeit.data.DataState;
 import de.rkirchner.podzeit.data.PodcastRepository;
 import de.rkirchner.podzeit.data.models.EpisodesPlaylistJoin;
 import de.rkirchner.podzeit.data.models.Series;
+import de.rkirchner.podzeit.playerclient.MediaSessionClient;
 import de.rkirchner.podzeit.playerclient.PlaylistManager;
 
 public class EpisodeListViewModel extends ViewModel {
@@ -25,12 +26,14 @@ public class EpisodeListViewModel extends ViewModel {
     private PodcastRepository repository;
     private PlaylistManager playlistManager;
     private Context context;
+    private MediaSessionClient mediaSessionClient;
 
     @Inject
-    public EpisodeListViewModel(PodcastRepository repository, PlaylistManager playlistManager, Context context) {
+    public EpisodeListViewModel(PodcastRepository repository, PlaylistManager playlistManager, Context context, MediaSessionClient mediaSessionClient) {
         this.repository = repository;
         this.context = context;
         this.playlistManager = playlistManager;
+        this.mediaSessionClient = mediaSessionClient;
     }
 
     public LiveData<Series> getSeries() {

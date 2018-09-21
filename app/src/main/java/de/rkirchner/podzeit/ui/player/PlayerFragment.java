@@ -71,28 +71,14 @@ public class PlayerFragment extends DaggerFragment {
                 updateMediaBarAnimation();
             }
         });
-        binding.playerFfwd.setOnClickListener(v -> {
-            viewModel.fastForward();
-        });
-        binding.playerRew.setOnClickListener(v -> {
-            viewModel.rewind();
-        });
-        binding.playerNext.setOnClickListener(v -> {
-            viewModel.skipToNext();
-        });
-        binding.playerPrev.setOnClickListener(v -> {
-            viewModel.skipToPrevious();
-        });
+        binding.playerFfwd.setOnClickListener(v -> viewModel.fastForward());
+        binding.playerRew.setOnClickListener(v -> viewModel.rewind());
+        binding.playerNext.setOnClickListener(v -> viewModel.skipToNext());
+        binding.playerPrev.setOnClickListener(v -> viewModel.skipToPrevious());
 
-        binding.playerTitle.setOnClickListener(v -> {
-            animateScrollViewChange();
-        });
-        binding.playerSummary.setOnClickListener(v -> {
-            animateScrollViewChange();
-        });
-        binding.playerExpandArrow.setOnClickListener(v -> {
-            animateScrollViewChange();
-        });
+        binding.playerTitle.setOnClickListener(v -> animateScrollViewChange());
+        binding.playerSummary.setOnClickListener(v -> animateScrollViewChange());
+        binding.playerExpandArrow.setOnClickListener(v -> animateScrollViewChange());
         viewModel.getCurrentMediaId().observe(this, mediaId -> {
             if (mediaId != null) this.mediaId = mediaId;
         });
