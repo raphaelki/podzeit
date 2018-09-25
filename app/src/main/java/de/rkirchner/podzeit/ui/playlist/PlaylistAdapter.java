@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.data.models.EpisodePlaylistEntryJoin;
 import de.rkirchner.podzeit.databinding.PlaylistItemBinding;
+import de.rkirchner.podzeit.playerclient.IPlaylistManager;
 import de.rkirchner.podzeit.playerclient.PlaylistManager;
 import de.rkirchner.podzeit.ui.common.BindingViewHolder;
 import de.rkirchner.podzeit.ui.common.FormatterUtil;
@@ -21,7 +22,7 @@ public class PlaylistAdapter extends RecyclerViewListAdapter<PlaylistItemBinding
 
     private FormatterUtil formatter;
     private OnStartDragListener onStartDragListener;
-    private PlaylistManager playlistManager;
+    private IPlaylistManager playlistManager;
     private PlaybackCallback playbackCallback;
 
     @Inject
@@ -41,7 +42,7 @@ public class PlaylistAdapter extends RecyclerViewListAdapter<PlaylistItemBinding
         holder.binding().setFormatter(formatter);
         holder.binding().playlistItemParent.setOnClickListener(v -> {
             Timber.d("Playlist item selected");
-            playbackCallback.onStartPlayback(getList().get(position).getPlaylistPosition());
+            playbackCallback.onStartPlayback(getList().get(position).getId());
         });
         if (onStartDragListener != null) {
             holder.binding().playlistItemSwapIcon.setOnTouchListener((v, event) -> {
@@ -55,7 +56,7 @@ public class PlaylistAdapter extends RecyclerViewListAdapter<PlaylistItemBinding
 
     @Override
     public void onItemDismiss(int position) {
-        playlistManager.removeEpisodeFromPlaylistAtPlaylistPosition(position);
+        playlistManager.removeEpisode(getList().get(position).getId());
         getList().remove(position);
         notifyItemRemoved(position);
     }
@@ -72,8 +73,12 @@ public class PlaylistAdapter extends RecyclerViewListAdapter<PlaylistItemBinding
             }
         }
         notifyItemMoved(startPosition, endPosition);
-        playlistManager.movePlaylistEntry(startPosition, endPosition);
         return true;
+    }
+
+    @Override
+    public void onItemChangedPosition(int startPosition, int endPosition) {
+        playlistManager.moveEpisode(startPosition, endPosition);
     }
 
     public void registerOnStartDragListener(OnStartDragListener onStartDragListener) {

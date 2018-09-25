@@ -16,6 +16,7 @@ import de.rkirchner.podzeit.R;
  * Sources:
  * https://medium.com/@ipaulpro/drag-and-swipe-with-recyclerview-b9456d2b1aaf
  * https://medium.com/@kitek/recyclerview-swipe-to-delete-easier-than-you-thought-cff67ff5e5f6
+ * https://stackoverflow.com/questions/35920584/android-how-to-catch-drop-action-of-itemtouchhelper-which-is-used-with-recycle
  */
 public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
@@ -25,6 +26,8 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
     private Drawable deleteIcon;
     private int intrinsicWidth;
     private int intrinsicHeight;
+    int dragFrom = -1;
+    int dragTo = -1;
 
 
     public ItemTouchHelperCallback(ItemTouchHelperAdapter adapter, Context context) {
@@ -56,6 +59,15 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                           RecyclerView.ViewHolder target) {
+
+        int fromPosition = viewHolder.getAdapterPosition();
+        int toPosition = target.getAdapterPosition();
+
+        if (dragFrom == -1) {
+            dragFrom = fromPosition;
+        }
+        dragTo = toPosition;
+
         mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
         return true;
     }
@@ -63,6 +75,18 @@ public class ItemTouchHelperCallback extends ItemTouchHelper.Callback {
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+    }
+
+    @Override
+    public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+        super.clearView(recyclerView, viewHolder);
+
+        if (dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
+            mAdapter.onItemChangedPosition(dragFrom, dragTo);
+        }
+
+        dragFrom = -1;
+        dragTo = -1;
     }
 
     @Override

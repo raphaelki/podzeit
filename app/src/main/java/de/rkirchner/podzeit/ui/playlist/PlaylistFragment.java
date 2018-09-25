@@ -69,8 +69,8 @@ public class PlaylistFragment extends DaggerFragment {
             }
 
             @Override
-            public void onStartPlayback(int playlistPosition) {
-                viewModel.startPlayback(playlistPosition);
+            public void onStartPlayback(int episodeId) {
+                viewModel.startPlayback(episodeId);
             }
         });
         binding.playlistRv.setAdapter(adapter);

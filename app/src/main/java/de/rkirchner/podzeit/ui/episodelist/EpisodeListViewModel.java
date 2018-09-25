@@ -17,6 +17,7 @@ import de.rkirchner.podzeit.data.DataState;
 import de.rkirchner.podzeit.data.PodcastRepository;
 import de.rkirchner.podzeit.data.models.EpisodesPlaylistJoin;
 import de.rkirchner.podzeit.data.models.Series;
+import de.rkirchner.podzeit.playerclient.IPlaylistManager;
 import de.rkirchner.podzeit.playerclient.MediaSessionClient;
 import de.rkirchner.podzeit.playerclient.PlaylistManager;
 
@@ -24,7 +25,7 @@ public class EpisodeListViewModel extends ViewModel {
 
     private final MutableLiveData<String> seriesRssUrl = new MutableLiveData<>();
     private PodcastRepository repository;
-    private PlaylistManager playlistManager;
+    private IPlaylistManager playlistManager;
     private Context context;
     private MediaSessionClient mediaSessionClient;
 
@@ -60,11 +61,11 @@ public class EpisodeListViewModel extends ViewModel {
     }
 
     public void removeEpisodeFromPlaylist(int episodeId) {
-        playlistManager.removeEpisodeFromPlaylist(episodeId);
+        playlistManager.removeEpisode(episodeId);
     }
 
     public void playNow(int episodeId) {
-        playlistManager.addEpisodeAndPlayNow(episodeId);
+        playlistManager.playNow(episodeId);
     }
 
     public void triggerRefresh() {

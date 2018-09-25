@@ -9,13 +9,14 @@ import javax.inject.Inject;
 
 import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.models.EpisodesPlaylistJoin;
+import de.rkirchner.podzeit.playerclient.IPlaylistManager;
 import de.rkirchner.podzeit.playerclient.PlaylistManager;
 
 public class EpisodeDetailsViewModel extends ViewModel {
 
     private EpisodeDao episodeDao;
     private MutableLiveData<Integer> episodeId = new MutableLiveData<>();
-    private PlaylistManager playlistManager;
+    private IPlaylistManager playlistManager;
 
     @Inject
     public EpisodeDetailsViewModel(EpisodeDao episodeDao, PlaylistManager playlistManager) {
@@ -24,7 +25,7 @@ public class EpisodeDetailsViewModel extends ViewModel {
     }
 
     public void playEpisode() {
-        playlistManager.addEpisodeAndPlayNow(episodeId.getValue());
+        playlistManager.playNow(episodeId.getValue());
     }
 
     public LiveData<EpisodesPlaylistJoin> getEpisode() {
@@ -36,7 +37,7 @@ public class EpisodeDetailsViewModel extends ViewModel {
     }
 
     public void removeFromPlaylist() {
-        playlistManager.removeEpisodeFromPlaylist(episodeId.getValue());
+        playlistManager.removeEpisode(episodeId.getValue());
     }
 
     public void setEpisodeId(int id) {

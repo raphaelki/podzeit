@@ -14,4 +14,12 @@ public class Constants {
     public static final String PLAYER_PLAYBACK_POSITION_KEY = "playback_position";
     public static final String NEEDS_CREDENTIALS_KEY = "needs_credentials";
     public static final String ERROR_BROADCAST = "error_broadcast";
+
+    public static final String QUEUE_COMMAND_ADD = "queue_add";
+    public static final String QUEUE_COMMAND_REMOVE = "queue_remove";
+    public static final String QUEUE_COMMAND_MOVE = "queue_move";
+    public static final String QUEUE_MOVE_FROM_KEY = "queue_move_from";
+    public static final String QUEUE_MOVE_TO_KEY = "queue_move_to";
+    public static final String QUEUE_EPISODE_ID_KEY = "queue_episode_id";
+    public static final String QUEUE_PLAYLIST_POSITION_KEY = "queue_playlist_position";
 }

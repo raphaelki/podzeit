@@ -25,6 +25,9 @@ public interface PlaylistDao {
     @Query(value = "SELECT id, isSelected, episodes.title AS title, playlistPosition, duration, url, series.title AS seriesTitle, wasPlayed FROM episodes INNER JOIN playlist ON playlist.episodeId = id INNER JOIN series ON series.rss_url = series_rss_url WHERE isSelected = 1")
     EpisodePlaylistEntryJoin getSelectedEpisodeSync();
 
+    @Query(value = "SELECT id, isSelected, episodes.title AS title, playlistPosition, duration, url, series.title AS seriesTitle, wasPlayed FROM episodes INNER JOIN playlist ON playlist.episodeId = id INNER JOIN series ON series.rss_url = series_rss_url WHERE url = :url")
+    EpisodePlaylistEntryJoin getEpisodePlaylistJoinFromUrl(String url);
+
     @Query(value = "SELECT * FROM playlist WHERE isSelected=1")
     PlaylistEntry getSelectedPlaylistEntry();
 
@@ -60,4 +63,7 @@ public interface PlaylistDao {
 
     @Query(value = "SELECT COUNT(*) FROM playlist")
     int getPlaylistEntryCount();
+
+    @Query(value = "SELECT COUNT(*) FROM playlist")
+    LiveData<Integer> getPlaylistEntryCountLiveData();
 }

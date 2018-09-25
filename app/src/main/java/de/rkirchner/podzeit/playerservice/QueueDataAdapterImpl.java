@@ -2,53 +2,83 @@ package de.rkirchner.podzeit.playerservice;
 
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueEditor;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 
-import java.util.Collections;
 import java.util.List;
+
+import de.rkirchner.podzeit.AppExecutors;
+import de.rkirchner.podzeit.data.local.EpisodeDao;
+import de.rkirchner.podzeit.data.local.PlaylistDao;
+import de.rkirchner.podzeit.data.models.Episode;
+import de.rkirchner.podzeit.data.models.PlaylistEntry;
 
 public class QueueDataAdapterImpl implements TimelineQueueEditor.QueueDataAdapter {
 
     private ConcatenatingMediaSource concatenatingMediaSource;
-    private List<MediaDescriptionCompat> queue;
     private MediaControllerCompat mediaControllerCompat;
+    private MediaSessionCompat mediaSession;
+    private AppExecutors appExecutors;
+    private PlaylistDao playlistDao;
+    private EpisodeDao episodeDao;
 
-    public QueueDataAdapterImpl(ConcatenatingMediaSource concatenatingMediaSource, List<MediaDescriptionCompat> queue, MediaControllerCompat mediaControllerCompat) {
+    public QueueDataAdapterImpl(AppExecutors appExecutors, PlaylistDao playlistDao, EpisodeDao episodeDao) {
         this.concatenatingMediaSource = concatenatingMediaSource;
         this.mediaControllerCompat = mediaControllerCompat;
-        this.queue = queue;
+        this.appExecutors = appExecutors;
+        this.playlistDao = playlistDao;
+        this.episodeDao = episodeDao;
     }
 
     @Override
     public MediaDescriptionCompat getMediaDescription(int position) {
-        if (position == -1) return null;
-        return queue.get(position);
+
+        return null;
     }
 
     @Override
     public void add(int position, MediaDescriptionCompat description) {
-        queue.add(position, description);
-
+        appExecutors.diskIO().execute(() -> {
+            Episode episode = episodeDao.getEpisodeForUrl(description.getMediaUri().toString());
+            PlaylistEntry playlistEntry = new PlaylistEntry(episode.getId(), position, false, 0);
+            playlistDao.insertEntry(playlistEntry);
+        });
     }
 
     @Override
     public void remove(int position) {
-//        mediaControllerCompat.getTransportControls().skipToQueueItem(position);
-        queue.remove(position);
+        appExecutors.diskIO().execute(() -> {
+            PlaylistEntry entryToRemove = playlistDao.getPlaylistEntryAtPosition(position);
+            List<PlaylistEntry> entriesToReorder = playlistDao.getEntriesForReordering(position);
+            for (PlaylistEntry entryToReorder : entriesToReorder) {
+                entryToReorder.setPlaylistPosition(entryToReorder.getPlaylistPosition() - 1);
+            }
+            playlistDao.updateEntries(entriesToReorder);
+            playlistDao.removeEpisodeFromPlaylist(entryToRemove);
+        });
     }
 
     @Override
-    public void move(int from, int to) {
-        if (from < to) {
-            for (int i = from; i < to; i++) {
-                Collections.swap(queue, i, i + 1);
+    public void move(int startPosition, int endPosition) {
+        appExecutors.diskIO().execute(() -> {
+            PlaylistEntry itemToMove = playlistDao.getPlaylistEntryAtPosition(startPosition);
+            List<PlaylistEntry> itemsToReorder;
+            if (startPosition < endPosition) {
+                itemsToReorder = playlistDao.getEntriesForReordering(startPosition + 1, endPosition);
+                for (PlaylistEntry itemToReorder : itemsToReorder) {
+                    itemToReorder.setPlaylistPosition(itemToReorder.getPlaylistPosition() - 1);
+                }
+            } else {
+                itemsToReorder = playlistDao.getEntriesForReordering(endPosition, startPosition - 1);
+                for (PlaylistEntry itemToReorder : itemsToReorder) {
+                    itemToReorder.setPlaylistPosition(itemToReorder.getPlaylistPosition() + 1);
+                }
             }
-        } else {
-            for (int i = from; i > to; i--) {
-                Collections.swap(queue, i, i - 1);
-            }
-        }
+            itemToMove.setPlaylistPosition(endPosition);
+            itemsToReorder.add(itemToMove);
+            playlistDao.updateEntries(itemsToReorder);
+        });
     }
 }
