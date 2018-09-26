@@ -28,7 +28,8 @@
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_field_required">This field is required</string>
-    <string name="shared_pref_hide_played_key">hide_played</string>
-    <string name="shared_pref_remove_after_playback_key">remove_after_playback</string>
-    <string name="shared_pref_seconds_to_skip_key">seconds_to_skip</string>
+
+    <string name="shared_pref_hide_played_key" translatable="false">hide_played</string>
+    <string name="shared_pref_remove_after_playback_key" translatable="false">remove_after_playback</string>
+    <string name="shared_pref_seconds_to_skip_key" translatable="false">seconds_to_skip</string>
 </resources>

@@ -26,7 +26,6 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -51,7 +50,6 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     AppExecutors appExecutors;
     @Inject
     PlaylistDao playlistDao;
-    private List<MediaDescriptionCompat> queue = new ArrayList<>();
 
     @Nullable
     @Override
@@ -78,7 +76,7 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
 
     private void createMediaSessionConnector() {
         concatenatingMediaSource = new ConcatenatingMediaSource();
-        mediaSessionConnector = new MediaSessionConnector(mediaSession);
+        mediaSessionConnector = new MediaSessionConnector(mediaSession, new PlaybackControllerImpl(this));
         playbackPreparer = new PlaybackPreparerImpl(player, playlistDao, episodeDao, appExecutors, this, concatenatingMediaSource);
         mediaSessionConnector.setPlayer(player, playbackPreparer);
         mediaSessionConnector.setQueueNavigator(new TimelineQueueNavigator(mediaSession) {
@@ -91,8 +89,6 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         });
         mediaSessionConnector.setErrorMessageProvider(new ErrorMessageProviderImpl());
         playbackPreparer.prepareMediaSourceFromDbPlaylist();
-//        TimelineQueueEditor.QueueDataAdapter queueDataAdapter = new QueueDataAdapterImpl(appExecutors, playlistDao, episodeDao);
-//        mediaSessionConnector.setQueueEditor(new TimelineQueueEditor(controller, concatenatingMediaSource, queueDataAdapter, new MediaSourceFactoryImpl(this)));
     }
 
     private void createPlayerInstance() {

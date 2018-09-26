@@ -23,4 +23,8 @@ public class Constants {
     public static final String QUEUE_EPISODE_ID_KEY = "queue_episode_id";
     public static final String QUEUE_PLAYLIST_POSITION_KEY = "queue_playlist_position";
     public static final String QUEUE_COMMAND_REBUILD_MEDIA_SOURCE = "queue_rebuild_media_source";
+
+    public static final String SHARED_PREF_HIDE_PLAYED_KEY = "shared_pref_hide_played";
+    public static final String SHARED_PREF_REMOVE_AFTER_PLAYBACK_KEY = "shared_pref_remove_after_playback";
+    public static final String SHARED_PREF_SECONDS_TO_SKIP_KEY = "shared_pref_seconds_to_skip";
 }

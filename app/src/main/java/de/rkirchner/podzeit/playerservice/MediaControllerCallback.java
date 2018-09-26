@@ -67,19 +67,21 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
     public void onMetadataChanged(MediaMetadataCompat metadata) {
         if (metadata != null && metadata.getDescription() != null && metadata.getDescription().getMediaUri() != null) {
             Uri uri = metadata.getDescription().getMediaUri();
-            appExecutors.diskIO().execute(() -> {
-                PlaylistEntry oldSelection = playlistDao.getSelectedPlaylistEntry();
-                if (oldSelection != null) {
-                    oldSelection.setSelected(false);
-                    playlistDao.updateEntry(oldSelection);
-                }
-                Episode episode = episodeDao.getEpisodeForUrl(uri.toString());
-                PlaylistEntry newSelection = playlistDao.getPlaylistEntry(episode.getId());
-                newSelection.setSelected(true);
-                playlistDao.updateEntry(newSelection);
-            });
-            Timber.d("Metadata changed: %s", metadata.getDescription().getTitle());
-            previousUri = uri;
+            if (previousUri != uri) {
+                appExecutors.diskIO().execute(() -> {
+                    PlaylistEntry oldSelection = playlistDao.getSelectedPlaylistEntry();
+                    if (oldSelection != null) {
+                        oldSelection.setSelected(false);
+                        playlistDao.updateEntry(oldSelection);
+                    }
+                    Episode episode = episodeDao.getEpisodeForUrl(uri.toString());
+                    PlaylistEntry newSelection = playlistDao.getPlaylistEntry(episode.getId());
+                    newSelection.setSelected(true);
+                    playlistDao.updateEntry(newSelection);
+                });
+                Timber.d("Metadata changed: %s", metadata.getDescription().getTitle());
+                previousUri = uri;
+            }
         }
     }
 }
