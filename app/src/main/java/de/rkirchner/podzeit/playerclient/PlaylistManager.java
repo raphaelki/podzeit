@@ -1,6 +1,5 @@
 package de.rkirchner.podzeit.playerclient;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -15,6 +14,7 @@ import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.local.PlaylistDao;
 import de.rkirchner.podzeit.data.models.Episode;
 import de.rkirchner.podzeit.data.models.PlaylistEntry;
+import timber.log.Timber;
 
 @Singleton
 public class PlaylistManager implements IPlaylistManager {
@@ -23,12 +23,10 @@ public class PlaylistManager implements IPlaylistManager {
     private EpisodeDao episodeDao;
     private AppExecutors appExecutors;
     private MediaSessionClient mediaSessionClient;
-    private Context context;
 
     @Inject
-    public PlaylistManager(PlaylistDao playlistDao, EpisodeDao episodeDao, AppExecutors appExecutors, MediaSessionClient mediaSessionClient, Context context) {
+    public PlaylistManager(PlaylistDao playlistDao, EpisodeDao episodeDao, AppExecutors appExecutors, MediaSessionClient mediaSessionClient) {
         this.playlistDao = playlistDao;
-        this.context = context;
         this.episodeDao = episodeDao;
         this.appExecutors = appExecutors;
         this.mediaSessionClient = mediaSessionClient;
@@ -59,6 +57,7 @@ public class PlaylistManager implements IPlaylistManager {
 
     @Override
     public void moveEpisode(int startPosition, int endPosition) {
+        Timber.d("Episode moved from %s to %s", startPosition, endPosition);
         appExecutors.diskIO().execute(() -> {
             PlaylistEntry itemToMove = playlistDao.getPlaylistEntryAtPosition(startPosition);
             List<PlaylistEntry> itemsToReorder;
@@ -66,11 +65,13 @@ public class PlaylistManager implements IPlaylistManager {
                 itemsToReorder = playlistDao.getEntriesForReordering(startPosition + 1, endPosition);
                 for (PlaylistEntry itemToReorder : itemsToReorder) {
                     itemToReorder.setPlaylistPosition(itemToReorder.getPlaylistPosition() - 1);
+                    Timber.d("Item moved from %s to %s", itemToReorder.getPlaylistPosition(), itemToReorder.getPlaylistPosition() - 1);
                 }
             } else {
                 itemsToReorder = playlistDao.getEntriesForReordering(endPosition, startPosition - 1);
                 for (PlaylistEntry itemToReorder : itemsToReorder) {
                     itemToReorder.setPlaylistPosition(itemToReorder.getPlaylistPosition() + 1);
+                    Timber.d("Item moved from %s to %s", itemToReorder.getPlaylistPosition(), itemToReorder.getPlaylistPosition() + 1);
                 }
             }
             itemToMove.setPlaylistPosition(endPosition);

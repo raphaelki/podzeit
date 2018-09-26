@@ -70,6 +70,7 @@
             tools:text="Was jetzt?" />
 
         <ImageButton
+            android:contentDescription="@string/move_episode_in_playlist_cd"
             android:id="@+id/playlist_item_swap_icon"
             android:layout_width="?listPreferredItemHeight"
             android:layout_height="0dp"
@@ -80,13 +81,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:contentDescription="@string/episode_list_episode_already_played_cd"
             android:id="@+id/playlist_item_headphone_icon"
             dontRemoveFromLayout="true"
             visible="@{episode.wasPlayed}"
             android:layout_width="15dp"
             android:layout_height="0dp"
             android:background="@null"
-
             android:src="@drawable/ic_headset"
             android:tint="#1e9100"
             app:layout_constraintEnd_toStartOf="@id/playlist_item_swap_icon"

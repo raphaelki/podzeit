@@ -35,6 +35,7 @@
                 app:toolbarId="@id/episode_list_toolbar">
 
                 <ImageView
+                    android:contentDescription="@string/series_picture_cd"
                     android:id="@+id/episode_list_iv"
                     imageUrl="@{series.thumbnailUrl}"
                     requestListener="@{requestListener}"

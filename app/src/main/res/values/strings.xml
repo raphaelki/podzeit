@@ -8,19 +8,10 @@
     <string name="now_playing_channel_name">Now playing</string>
     <string name="now_playing_channel_description">Shows currently playing episode</string>
 
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-
-    <!-- Example settings for Data & Sync -->
-
-    <!-- Example settings for Notifications -->
-
     <string name="login_dialog_message">Please provide credentials for: %s</string>
 
     <string name="title_activity_login">Sign in</string>
 
-    <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in</string>
@@ -32,4 +23,25 @@
     <string name="shared_pref_hide_played_key" translatable="false">hide_played</string>
     <string name="shared_pref_remove_after_playback_key" translatable="false">remove_after_playback</string>
     <string name="shared_pref_seconds_to_skip_key" translatable="false">seconds_to_skip</string>
+    <string name="episode_list_add_to_playlist_cd">Add or remove the episode to/from the playlist</string>
+    <string name="episode_list_play_episode_cd">Play episode</string>
+    <string name="episode_list_episode_already_played_cd">Episode already played</string>
+    <string name="series_picture_cd">Picture of the podcast series</string>
+    <string name="skip_to_previous_track_cd">Skip to previous episode</string>
+    <string name="rewind_cd">Rewind</string>
+    <string name="play_or_pause_cd">Play or pause</string>
+    <string name="fast_forward_cd">Fast forward</string>
+    <string name="skip_to_next_episode_cd">Skip to next episode</string>
+    <string name="no_items">No items in playlist. Please add episodes…</string>
+    <string name="add_episodes">Add episodes</string>
+    <string name="no_episode_loaded">No episode loaded</string>
+    <string name="move_episode_in_playlist_cd">Move episode in playlist</string>
+    <string name="playback_time_zero" translatable="false">00:00</string>
+    <string name="settings_hide_episodes_summary">Hide already played episodes in the series catalog</string>
+    <string name="settings_hide_episodes_title">Hide played episodes</string>
+    <string name="settings_remove_episodes_summary">Remove episode from playlist after playback</string>
+    <string name="settings_remove_episodes_title">Remove after playback</string>
+    <string name="settings_skip_sec_summary">Skipping %s seconds on rewind or fast-forward</string>
+    <string name="settings_skip_sec_title">Seconds to skip</string>
+    <string name="preferences">Preferences</string>
 </resources>

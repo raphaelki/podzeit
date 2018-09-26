@@ -107,6 +107,7 @@
             tools:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet." />
 
         <ImageButton
+            android:contentDescription="@string/episode_list_add_to_playlist_cd"
             android:id="@+id/episode_list_item_playlist_add_icon"
             android:layout_width="50dp"
             android:layout_height="0dp"
@@ -118,6 +119,7 @@
             tools:src="@drawable/ic_playlist_add" />
 
         <ImageButton
+            android:contentDescription="@string/episode_list_play_episode_cd"
             android:id="@+id/episode_list_item_play_icon"
             android:layout_width="50dp"
             android:layout_height="0dp"
@@ -129,6 +131,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:contentDescription="@string/episode_list_episode_already_played_cd"
             android:id="@+id/episode_list_item_headphone_icon"
             dontRemoveFromLayout="true"
             visible="@{episode.wasPlayed}"

@@ -8,17 +8,6 @@
     tools:context=".MainActivity"
     android:orientation="vertical">
 
-    <!--<android.support.v7.widget.Toolbar-->
-    <!--android:id="@+id/main_toolbar"-->
-    <!--style="@style/AppTheme.PopupOverlay"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="?attr/actionBarSize"-->
-    <!--android:background="?attr/colorPrimary"-->
-    <!--app:layout_constraintTop_toTopOf="parent"-->
-    <!--app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--app:layout_constraintRight_toRightOf="parent"-->
-    <!--android:elevation="6dp"/>-->
-
     <FrameLayout
         android:id="@+id/upper_fragment_frame"
         android:layout_width="0dp"
@@ -35,7 +24,8 @@
         android:src="@drawable/player_shadow"
         app:layout_constraintBottom_toTopOf="@id/player_fragment_frame"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="ContentDescription" />
 
     <FrameLayout
         android:id="@+id/player_fragment_frame"

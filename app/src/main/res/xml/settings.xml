@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="Settings">
-    <PreferenceCategory android:title="Preferences">
+    <PreferenceCategory android:title="@string/preferences">
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/shared_pref_remove_after_playback_key"
             android:layout="@layout/custom_settings_layout"
-            android:summary="Remove episode from playlist after playback"
-            android:title="Remove after playback" />
+            android:summary="@string/settings_remove_episodes_summary"
+            android:title="@string/settings_remove_episodes_title" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="@string/shared_pref_hide_played_key"
             android:layout="@layout/custom_settings_layout"
-            android:summary="Hide already played eisodes in the series catalog"
-            android:title="Hide played episode in catalog" />
+            android:summary="@string/settings_hide_episodes_summary"
+            android:title="@string/settings_hide_episodes_title" />
         <ListPreference
             android:defaultValue="15"
             android:entries="@array/skip_seconds_entries"
             android:entryValues="@array/skip_seconds_values"
             android:key="@string/shared_pref_seconds_to_skip_key"
             android:layout="@layout/custom_settings_layout"
-            android:summary="Skipping %s seconds on rewind or fast-forward"
-            android:title="Seconds to skip" />
+            android:summary="@string/settings_skip_sec_summary"
+            android:title="@string/settings_skip_sec_title" />
 
     </PreferenceCategory>
 

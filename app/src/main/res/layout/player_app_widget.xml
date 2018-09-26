@@ -19,12 +19,13 @@
         android:ellipsize="end"
         android:gravity="center"
         android:lines="2"
-        android:text="No episode loaded"
+        android:text="@string/no_episode_loaded"
         android:textSize="15sp"
         android:textStyle="bold"
         tools:text="Die Dichterin Julia Engelmann übernimmt mehr Verantwortung" />
 
     <ImageView
+        android:contentDescription="@string/series_picture_cd"
         android:id="@+id/widget_thumbnail"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -43,6 +44,7 @@
         android:gravity="center_horizontal">
 
         <ImageButton
+            android:contentDescription="@string/skip_to_previous_track_cd"
             android:id="@+id/widget_previous"
             style="@style/MediaButtons"
             android:src="@drawable/exo_controls_previous"
@@ -52,6 +54,7 @@
             android:tint="#99000000" />
 
         <ImageButton
+            android:contentDescription="@string/play_or_pause_cd"
             android:id="@+id/widget_play"
             android:layout_width="60dp"
             android:layout_height="35dp"
@@ -62,6 +65,7 @@
             android:tint="#99000000" />
 
         <ImageButton
+            android:contentDescription="@string/skip_to_next_episode_cd"
             android:id="@+id/widget_next"
             style="@style/MediaButtons"
             android:src="@drawable/exo_controls_next"

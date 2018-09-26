@@ -116,7 +116,7 @@ public class PlaybackPreparerImpl implements MediaSessionConnector.PlaybackPrepa
             buildPlaylistMediaSource();
             exoPlayer.prepare(concatenatingMediaSource);
             PlaylistEntry newSelection = playlistDao.getSelectedPlaylistEntry();
-            if (newSelection != null)
+            if (newSelection != null && newSelection.getPlaybackPosition() < concatenatingMediaSource.getSize())
                 exoPlayer.seekTo(newSelection.getPlaylistPosition(), newSelection.getPlaybackPosition());
         });
     }
