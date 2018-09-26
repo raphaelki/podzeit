@@ -34,6 +34,9 @@ import dagger.android.AndroidInjection;
 import de.rkirchner.podzeit.AppExecutors;
 import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.local.PlaylistDao;
+import de.rkirchner.podzeit.data.models.Episode;
+import de.rkirchner.podzeit.data.models.PlaylistEntry;
+import timber.log.Timber;
 
 public class MediaPlaybackService extends MediaBrowserServiceCompat {
 
@@ -46,6 +49,7 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     private PlaybackPreparerImpl playbackPreparer;
     private MediaControllerCompat controller;
     private ConcatenatingMediaSource concatenatingMediaSource;
+    private TimelineQueueNavigator timelineQueueNavigator;
     @Inject
     AppExecutors appExecutors;
     @Inject
@@ -79,14 +83,15 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         mediaSessionConnector = new MediaSessionConnector(mediaSession, new PlaybackControllerImpl(this));
         playbackPreparer = new PlaybackPreparerImpl(player, playlistDao, episodeDao, appExecutors, this, concatenatingMediaSource);
         mediaSessionConnector.setPlayer(player, playbackPreparer);
-        mediaSessionConnector.setQueueNavigator(new TimelineQueueNavigator(mediaSession) {
+        timelineQueueNavigator = new TimelineQueueNavigator(mediaSession) {
             private Timeline.Window window = new Timeline.Window();
 
             @Override
             public MediaDescriptionCompat getMediaDescription(Player player, int windowIndex) {
                 return (MediaDescriptionCompat) player.getCurrentTimeline().getWindow(windowIndex, window, true).tag;
             }
-        });
+        };
+        mediaSessionConnector.setQueueNavigator(timelineQueueNavigator);
         mediaSessionConnector.setErrorMessageProvider(new ErrorMessageProviderImpl());
         playbackPreparer.prepareMediaSourceFromDbPlaylist();
     }
@@ -99,6 +104,35 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
                 new DefaultRenderersFactory(this),
                 new DefaultTrackSelector(adaptiveTrackSelectionFactory),
                 new DefaultLoadControl());
+        player.addListener(new Player.DefaultEventListener() {
+
+            @Override
+            public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
+                Timber.d("Timeline changed: %s", reason);
+            }
+
+            @Override
+            public void onPositionDiscontinuity(int reason) {
+                switch (reason) {
+                    case Player.DISCONTINUITY_REASON_PERIOD_TRANSITION:
+                        onEpisodeComplete();
+                        break;
+                }
+                Timber.d("On player discontinuity: %s %s", reason, player.getCurrentWindowIndex());
+            }
+        });
+    }
+
+    private void onEpisodeComplete() {
+        appExecutors.diskIO().execute(() -> {
+            PlaylistEntry playlistEntry = playlistDao.getPlaylistEntryAtPosition(player.getCurrentWindowIndex() - 1);
+            if (playlistEntry != null) {
+                Episode episode = episodeDao.getEpisodeForId(playlistEntry.getEpisodeId());
+                episode.setWasPlayed(true);
+                episodeDao.updateEpisode(episode);
+                Timber.d("Mark episode %s as played", episode.getTitle());
+            }
+        });
     }
 
     private void createMediaSession() {
