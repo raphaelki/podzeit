@@ -9,4 +9,6 @@ public interface IPlaylistManager {
     void moveEpisode(int startPosition, int endPosition);
 
     void playNow(int episodeId);
+
+    void triggerMediaSourceRebuild();
 }

@@ -29,6 +29,7 @@ public class LoginViewModel extends ViewModel {
         Series seriesToUpdate = series.getValue();
         seriesToUpdate.setCredentials(encodeCredentials(username, password));
         repository.updateSeries(seriesToUpdate);
+        playlistManager.triggerMediaSourceRebuild();
     }
 
     public void setAuthority(String uriAuthority) {
@@ -62,6 +63,7 @@ public class LoginViewModel extends ViewModel {
         byte[] decoded = Base64.decode(credentials, Base64.URL_SAFE | Base64.NO_WRAP);
         String decodedStr = new String(decoded);
         String[] credentialsArray = decodedStr.split(":");
+        if (credentialsArray.length < 2) return "";
         return credentialsArray[1];
     }
 

@@ -35,6 +35,13 @@ public interface EpisodeDao {
             "WHERE id= :episodeId")
     MetadataJoin getEpisodeSync(int episodeId);
 
+    @Query(value = "SELECT id, episodes.title AS episodeTitle, episodes.summary," +
+            " thumbnailUrl, url, series.title AS seriesTitle, credentials " +
+            "FROM episodes " +
+            "LEFT JOIN series ON series.rss_url = series_rss_url " +
+            "WHERE url= :url")
+    MetadataJoin getEpisodeSync(String url);
+
     @Query(value = "SELECT id, episodes.title AS episodeTitle, episodes.summary, thumbnailUrl, url, series.title AS seriesTitle, credentials " +
             "FROM episodes " +
             "LEFT JOIN series ON series.rss_url = series_rss_url " +

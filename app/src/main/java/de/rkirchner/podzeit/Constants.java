@@ -22,4 +22,5 @@ public class Constants {
     public static final String QUEUE_MOVE_TO_KEY = "queue_move_to";
     public static final String QUEUE_EPISODE_ID_KEY = "queue_episode_id";
     public static final String QUEUE_PLAYLIST_POSITION_KEY = "queue_playlist_position";
+    public static final String QUEUE_COMMAND_REBUILD_MEDIA_SOURCE = "queue_rebuild_media_source";
 }

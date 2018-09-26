@@ -90,7 +90,7 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
             }
         });
         mediaSessionConnector.setErrorMessageProvider(new ErrorMessageProviderImpl());
-        playbackPreparer.prepareMediaSourceFromPlaylist();
+        playbackPreparer.prepareMediaSourceFromDbPlaylist();
 //        TimelineQueueEditor.QueueDataAdapter queueDataAdapter = new QueueDataAdapterImpl(appExecutors, playlistDao, episodeDao);
 //        mediaSessionConnector.setQueueEditor(new TimelineQueueEditor(controller, concatenatingMediaSource, queueDataAdapter, new MediaSourceFactoryImpl(this)));
     }

@@ -90,4 +90,9 @@ public class PlaylistManager implements IPlaylistManager {
             mediaSessionClient.getTransportControls().playFromUri(Uri.parse(episode.getUrl()), null);
         });
     }
+
+    @Override
+    public void triggerMediaSourceRebuild() {
+        mediaSessionClient.getMediaController().sendCommand(Constants.QUEUE_COMMAND_REBUILD_MEDIA_SOURCE, null, null);
+    }
 }

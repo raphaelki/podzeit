@@ -18,6 +18,7 @@ import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.List;
@@ -36,6 +37,8 @@ import timber.log.Timber;
 public class PlaybackPreparerImpl implements MediaSessionConnector.PlaybackPreparer {
 
     private static final String USER_AGENT = "zeit";
+    private static final String AUTH_PREFIX = "Basic ";
+    private static final String AUTHORIZATION_REQUEST_KEY = "Authorization";
     private SimpleExoPlayer exoPlayer;
     private PlaylistDao playlistDao;
     private EpisodeDao episodeDao;
@@ -98,7 +101,7 @@ public class PlaybackPreparerImpl implements MediaSessionConnector.PlaybackPrepa
     }
 
     private void addAndPlayNewEntry(Uri uri) {
-        Episode episode = episodeDao.getEpisodeForUrl(uri.toString());
+        MetadataJoin episode = episodeDao.getEpisodeSync(uri.toString());
         MediaSource mediaSource = buildMediaSourceForEpisode(episode);
         concatenatingMediaSource.addMediaSource(mediaSource);
         exoPlayer.prepare(concatenatingMediaSource);
@@ -107,8 +110,9 @@ public class PlaybackPreparerImpl implements MediaSessionConnector.PlaybackPrepa
         exoPlayer.seekTo(concatenatingMediaSource.getSize() - 1, 0);
     }
 
-    public void prepareMediaSourceFromPlaylist() {
+    public void prepareMediaSourceFromDbPlaylist() {
         appExecutors.diskIO().execute(() -> {
+            concatenatingMediaSource.clear();
             buildPlaylistMediaSource();
             exoPlayer.prepare(concatenatingMediaSource);
             PlaylistEntry newSelection = playlistDao.getSelectedPlaylistEntry();
@@ -117,27 +121,31 @@ public class PlaybackPreparerImpl implements MediaSessionConnector.PlaybackPrepa
         });
     }
 
-    private MediaSource buildMediaSourceForEpisode(Episode episode) {
+    private MediaSource buildMediaSourceForEpisode(MetadataJoin episode) {
         ExtractorMediaSource.Factory factory = new ExtractorMediaSource.Factory(dataSourceFactory);
+        if (episode.getCredentials() != null && !episode.getCredentials().isEmpty()) {
+            HttpDataSource.RequestProperties requestProperties = dataSourceFactory.getDefaultRequestProperties();
+            String auth = AUTH_PREFIX + episode.getCredentials();
+            requestProperties.set(AUTHORIZATION_REQUEST_KEY, auth);
+        }
         factory.setTag(getMediaDescription(episode));
         return factory.createMediaSource(Uri.parse(episode.getUrl()));
     }
 
     private void buildPlaylistMediaSource() {
         List<PlaylistEntry> playlistEntries = playlistDao.getPlaylistEntriesSync();
-        concatenatingMediaSource.clear();
         for (PlaylistEntry entry : playlistEntries) {
-            Episode episode = episodeDao.getEpisodeForId(entry.getEpisodeId());
+            MetadataJoin episode = episodeDao.getEpisodeSync(entry.getEpisodeId());
             MediaSource mediaSource = buildMediaSourceForEpisode(episode);
             concatenatingMediaSource.addMediaSource(mediaSource);
         }
     }
 
-    private MediaDescriptionCompat getMediaDescription(Episode episode) {
+    private MediaDescriptionCompat getMediaDescription(MetadataJoin episode) {
         MediaDescriptionCompat.Builder builder = new MediaDescriptionCompat.Builder();
-        return builder.setTitle(episode.getTitle())
+        return builder.setTitle(episode.getEpisodeTitle())
                 .setDescription(episode.getSummary())
-                .setSubtitle(episode.getSubtitle())
+                .setSubtitle(episode.getSeriesTitle())
                 .setMediaUri(Uri.parse(episode.getUrl()))
                 .setIconBitmap(retrieveThumbnail(episode.getId()))
                 .build();
@@ -148,7 +156,8 @@ public class PlaybackPreparerImpl implements MediaSessionConnector.PlaybackPrepa
         return new String[]{
                 Constants.QUEUE_COMMAND_ADD,
                 Constants.QUEUE_COMMAND_MOVE,
-                Constants.QUEUE_COMMAND_REMOVE};
+                Constants.QUEUE_COMMAND_REMOVE,
+                Constants.QUEUE_COMMAND_REBUILD_MEDIA_SOURCE};
     }
 
     @Override
@@ -163,7 +172,7 @@ public class PlaybackPreparerImpl implements MediaSessionConnector.PlaybackPrepa
             appExecutors.diskIO().execute(() -> {
                 PlaylistEntry playlistEntry = playlistDao.getPlaylistEntry(episodeId);
                 if (playlistEntry != null) return;
-                Episode episode = episodeDao.getEpisodeForId(episodeId);
+                MetadataJoin episode = episodeDao.getEpisodeSync(episodeId);
                 MediaSource mediaSource = buildMediaSourceForEpisode(episode);
                 concatenatingMediaSource.addMediaSource(mediaSource);
                 playlistEntry = new PlaylistEntry(episodeId, concatenatingMediaSource.getSize() - 1, false, 0);
@@ -172,6 +181,8 @@ public class PlaybackPreparerImpl implements MediaSessionConnector.PlaybackPrepa
         } else if (command.equals(Constants.QUEUE_COMMAND_REMOVE)) {
             int position = extras.getInt(Constants.QUEUE_PLAYLIST_POSITION_KEY);
             concatenatingMediaSource.removeMediaSource(position);
+        } else if (command.equals(Constants.QUEUE_COMMAND_REBUILD_MEDIA_SOURCE)) {
+            prepareMediaSourceFromDbPlaylist();
         }
     }
 
