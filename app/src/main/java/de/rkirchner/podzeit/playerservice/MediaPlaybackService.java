@@ -2,7 +2,9 @@ package de.rkirchner.podzeit.playerservice;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.MediaBrowserCompat;
@@ -32,6 +34,7 @@ import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
 import de.rkirchner.podzeit.AppExecutors;
+import de.rkirchner.podzeit.R;
 import de.rkirchner.podzeit.data.local.EpisodeDao;
 import de.rkirchner.podzeit.data.local.PlaylistDao;
 import de.rkirchner.podzeit.data.models.Episode;
@@ -54,6 +57,24 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
     AppExecutors appExecutors;
     @Inject
     PlaylistDao playlistDao;
+    private boolean removeEpisodeAfterPlayback = false;
+    private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceListener =
+            (sharedPreferences, key) -> {
+                if (key.equals(getString(R.string.shared_pref_remove_after_playback_key))) {
+                    setRemoveEpisodeAfterPlayback(sharedPreferences);
+                }
+            };
+
+    private void setRemoveEpisodeAfterPlayback(SharedPreferences sharedPreferences) {
+        removeEpisodeAfterPlayback = sharedPreferences.getBoolean(getString(R.string.shared_pref_remove_after_playback_key), false);
+        Timber.d("remove episode after playback: %s", removeEpisodeAfterPlayback);
+    }
+
+    private void setupSharedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        setRemoveEpisodeAfterPlayback(sharedPreferences);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceListener);
+    }
 
     @Nullable
     @Override
@@ -76,6 +97,7 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
         createMediaSession();
         createMediaSessionConnector();
         setSessionToken(mediaSession.getSessionToken());
+        setupSharedPreferences();
     }
 
     private void createMediaSessionConnector() {
@@ -125,12 +147,17 @@ public class MediaPlaybackService extends MediaBrowserServiceCompat {
 
     private void onEpisodeComplete() {
         appExecutors.diskIO().execute(() -> {
-            PlaylistEntry playlistEntry = playlistDao.getPlaylistEntryAtPosition(player.getCurrentWindowIndex() - 1);
+            int indexOfEpisodeCompleted = player.getCurrentWindowIndex() - 1;
+            PlaylistEntry playlistEntry = playlistDao.getPlaylistEntryAtPosition(indexOfEpisodeCompleted);
             if (playlistEntry != null) {
                 Episode episode = episodeDao.getEpisodeForId(playlistEntry.getEpisodeId());
                 episode.setWasPlayed(true);
                 episodeDao.updateEpisode(episode);
                 Timber.d("Mark episode %s as played", episode.getTitle());
+                if (removeEpisodeAfterPlayback) {
+                    concatenatingMediaSource.removeMediaSource(indexOfEpisodeCompleted);
+                    playlistDao.removeEpisodeFromPlaylist(playlistEntry);
+                }
             }
         });
     }
