@@ -5,6 +5,6 @@
         android:id="@+id/episode_details_menu_singin"
         android:icon="@drawable/ic_vpn_key"
         android:iconTint="#c1000000"
-        android:title="Edit credentials"
+        android:title="@string/edit_credentials"
         app:showAsAction="always" />
 </menu>

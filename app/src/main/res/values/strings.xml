@@ -45,4 +45,9 @@
     <string name="settings_skip_sec_title">Seconds to skip</string>
     <string name="preferences">Preferences</string>
     <string name="fetch_toast">%d new episodes available</string>
+    <string name="podcast_series">Podcast series</string>
+    <string name="playlist" translatable="false">Playlist</string>
+    <string name="settings">Settings</string>
+    <string name="connection_loss">Error loading episode. No internet connection?</string>
+    <string name="edit_credentials" translatable="false">Edit credentials</string>
 </resources>

@@ -29,7 +29,7 @@ public class MainActivity extends DaggerAppCompatActivity
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Snackbar.make(findViewById(R.id.upper_fragment_frame), "Error loading episode. No internet connection?", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(findViewById(R.id.upper_fragment_frame), R.string.connection_loss, Snackbar.LENGTH_LONG).show();
         }
     };
     private IntentFilter intentFilter = new IntentFilter(Constants.ERROR_BROADCAST);

@@ -37,4 +37,8 @@
     <string name="settings_skip_sec_title">Sekunden beim Spulen</string>
     <string name="preferences">Einstellungen</string>
     <string name="fetch_toast">%d neue Episoden verfügbar</string>
+    <string name="podcast_series">Podcast Serien</string>
+    <string name="settings">Einstellungen</string>
+    <string name="connection_loss">Fehler beim Laden der Episode. Keine Internetverbindung?</string>
+    <string name="edit_credentials" translatable="false">Logindaten bearbeiten</string>
 </resources>

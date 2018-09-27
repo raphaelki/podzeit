@@ -109,7 +109,7 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
         Fade fade = new Fade();
         fade.excludeTarget(Toolbar.class, true);
         fragment.setExitTransition(fade);
-        Slide slide = new Slide(Gravity.RIGHT);
+        Slide slide = new Slide(Gravity.END);
         slide.excludeTarget(Toolbar.class, true);
         fragment.setEnterTransition(slide);
     }
@@ -119,7 +119,6 @@ public class NavigationController implements SeriesGridClickCallback, EpisodeLis
         fragment.setEnterTransition(new Fade());
         fragment.setExitTransition(new Fade());
         setTransitionAndNavigateToFragment(fragment, false);
-//        hidePlayer();
     }
 
     private void setTransitionAndNavigateToFragment(Fragment fragment, boolean setTransition) {
