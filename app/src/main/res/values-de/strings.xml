@@ -36,4 +36,5 @@
     <string name="settings_skip_sec_summary">Springe %s Sekunden beim Vor- oder Rückspulen</string>
     <string name="settings_skip_sec_title">Sekunden beim Spulen</string>
     <string name="preferences">Einstellungen</string>
+    <string name="fetch_toast">%d neue Episoden verfügbar</string>
 </resources>

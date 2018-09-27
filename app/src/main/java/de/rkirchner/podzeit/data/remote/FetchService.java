@@ -74,7 +74,7 @@ public class FetchService extends JobIntentService {
     public void onDestroy() {
         Timber.d("All work done. Shutting down service.");
         if (totalNewEpisodeCount > 0) {
-            Toast.makeText(this, "Fetched " + totalNewEpisodeCount + " new episodes", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.fetch_toast, totalNewEpisodeCount), Toast.LENGTH_LONG).show();
         }
         notificationManager.cancel(UPDATE_NOTIFICATION_ID);
         super.onDestroy();

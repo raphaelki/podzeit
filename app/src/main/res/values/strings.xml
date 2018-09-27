@@ -44,4 +44,5 @@
     <string name="settings_skip_sec_summary">Skipping %s seconds on rewind or fast-forward</string>
     <string name="settings_skip_sec_title">Seconds to skip</string>
     <string name="preferences">Preferences</string>
+    <string name="fetch_toast">%d new episodes available</string>
 </resources>
